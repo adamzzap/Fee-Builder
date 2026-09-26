@@ -1,0 +1,1346 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>zzap Fee Builder</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1D2421">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fee Builder">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+:root{
+  --paper:#EEF0EA; --sheet:#FAFBF7; --ink:#1D2421; --ink-2:#5A635E; --ink-3:#8A938D;
+  --rule:#D2D7CC; --rule-2:#E3E7DE;
+  --design:#2B5E79; --con:#A8741F; --red:#B5402B; --good:#3D7A4E;
+  --field:#FFFFFF;
+  --f-disp:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --paper:#131817; --sheet:#1B2120; --ink:#E4E8E2; --ink-2:#A0A9A3; --ink-3:#6E7872;
+    --rule:#343C39; --rule-2:#272E2C;
+    --design:#72A9C7; --con:#D8A34E; --red:#E27660; --good:#74B486; --field:#232A28;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#131817; --sheet:#1B2120; --ink:#E4E8E2; --ink-2:#A0A9A3; --ink-3:#6E7872;
+  --rule:#343C39; --rule-2:#272E2C;
+  --design:#72A9C7; --con:#D8A34E; --red:#E27660; --good:#74B486; --field:#232A28;
+}
+:root{
+  --ph-pre:color-mix(in srgb,var(--design) 42%,var(--sheet));
+  --ph-sd:color-mix(in srgb,var(--design) 62%,var(--sheet));
+  --ph-dd:color-mix(in srgb,var(--design) 80%,var(--sheet));
+  --ph-cd:var(--design);
+  --ph-spec:color-mix(in srgb,var(--design) 30%,var(--ink-3));
+  --ph-tender:color-mix(in srgb,var(--con) 45%,var(--sheet));
+  --ph-ca1:color-mix(in srgb,var(--con) 70%,var(--sheet));
+  --ph-ca2:var(--con);
+  --ph-ca3:color-mix(in srgb,var(--con) 58%,var(--sheet));
+  --ph-warr:color-mix(in srgb,var(--con) 30%,var(--sheet));
+  --ca-mtg:color-mix(in srgb,var(--design) 55%,var(--sheet));
+  --ca-sv:color-mix(in srgb,var(--good) 60%,var(--sheet));
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+.panel,.stage,.g2>*,.g3>*{min-width:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:1180px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-disp);font-weight:600;letter-spacing:.02em;text-wrap:balance;margin:0}
+h2{font-size:25px;text-transform:uppercase}
+h3{font-size:16px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2)}
+.mono,.fig{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.lbl{display:block;font-family:var(--f-disp);font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2);font-weight:500}
+.lbl b{font-family:var(--f-mono);font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink);margin-left:6px}
+.note{color:var(--ink-2);font-size:13.5px;max-width:72ch;margin:0}
+input[type=number],input[type=text],select,textarea{font:inherit;font-family:var(--f-mono);font-size:14px;color:var(--ink);background:var(--field);border:1px solid var(--rule);border-radius:3px;padding:6px 8px;width:100%;min-width:0}
+input[type=text]{font-family:var(--f-body)}
+textarea{font-size:13px;line-height:1.5;resize:vertical}
+input:focus-visible,select:focus-visible,button:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--design);outline-offset:1px}
+input[type=range]{width:100%;accent-color:var(--ink);margin:6px 0 0}
+input[type=checkbox]{accent-color:var(--design);width:16px;height:16px;margin:0;flex:none}
+button{font:inherit;font-family:var(--f-disp);text-transform:uppercase;letter-spacing:.08em;font-size:14px;background:transparent;color:var(--ink);border:1px solid var(--ink);border-radius:3px;padding:6px 12px;cursor:pointer}
+button:hover{background:var(--ink);color:var(--sheet)}
+button.solid{background:var(--ink);color:var(--sheet)}
+button.quiet{border-color:var(--rule);color:var(--ink-2)}
+button:disabled{opacity:.4;cursor:not-allowed;background:transparent;color:var(--ink)}
+.scale{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-3);font-family:var(--f-disp);letter-spacing:.06em;text-transform:uppercase}
+.ref{display:inline-block;font-family:var(--f-mono);font-size:10.5px;letter-spacing:0;text-transform:none;color:var(--design);border:1px solid color-mix(in srgb,var(--design) 45%,transparent);border-radius:2px;padding:0 4px;margin-left:6px;vertical-align:1px;font-weight:400}
+.chk{display:flex;gap:8px;align-items:center;cursor:pointer}
+
+/* Steppers and touch */
+.stp{display:flex;align-items:stretch;min-width:0}
+.stp input{text-align:center;border-radius:0;-moz-appearance:textfield;min-width:0;flex:1 1 auto}
+.stp input::-webkit-inner-spin-button,.stp input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.stp button{flex:none;width:32px;padding:0;border:1px solid var(--rule);background:var(--paper);color:var(--ink);font:500 17px var(--f-mono);text-transform:none;letter-spacing:0;border-radius:3px 0 0 3px;touch-action:manipulation}
+.stp button:last-child{border-radius:0 3px 3px 0}
+.stp button:hover{background:var(--ink);color:var(--sheet)}
+.gb-note .stp{display:inline-flex;vertical-align:middle;width:auto}
+.gutbar .gb-note .stp input{width:52px}
+@media (pointer:coarse){
+ .stp button{width:42px;font-size:20px}
+ input[type=number],input[type=text],select{min-height:40px;font-size:16px}
+ input[type=range]{-webkit-appearance:none;appearance:none;height:34px;background:transparent}
+ input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:var(--rule)}
+ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--ink);margin-top:-10px;border:3px solid var(--sheet);box-shadow:0 0 0 1px var(--ink)}
+ input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:var(--rule)}
+ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--ink);border:3px solid var(--sheet)}
+ input[type=checkbox]{width:22px;height:22px}
+}
+/* Title block */
+header.tb{margin-top:20px;display:grid;grid-template-columns:1fr repeat(5,1fr);border:1.5px solid var(--ink);background:var(--sheet)}
+header.tb>div{padding:11px 13px;border-left:1px solid var(--ink);display:flex;flex-direction:column;gap:3px;min-width:0}
+header.tb>div:first-child{border-left:0}
+.brand{font-family:var(--f-disp);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.proj{font-family:var(--f-disp);font-size:21px;font-weight:600;border:0;border-bottom:1px dashed var(--rule);background:transparent;padding:2px 0;border-radius:0}
+.fig{font-size:21px;font-weight:500;line-height:1.15}
+.sub{font-size:12px;color:var(--ink-2);font-family:var(--f-mono)}
+@media (min-width:1000px){header.tb{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;box-shadow:0 6px 16px -12px rgba(0,0,0,.35)}}
+@media (max-width:999px){header.tb{grid-template-columns:1fr 1fr 1fr}header.tb>div:first-child{grid-column:1/-1;border-bottom:1px solid var(--ink)}header.tb>div:nth-child(2),header.tb>div:nth-child(5){border-left:0}header.tb>div:nth-child(n+2):nth-child(-n+4){border-bottom:1px solid var(--ink)}}
+@media (max-width:560px){header.tb{grid-template-columns:1fr 1fr}header.tb>div{border-left:0!important;border-bottom:1px solid var(--ink)}header.tb>div:nth-child(even){border-left:1px solid var(--ink)!important}header.tb>div:nth-child(6){display:none}.fig{font-size:18px}}
+
+/* Sections */
+details.sec{margin-top:30px}
+details.sec{margin-top:10px!important}
+details.sec>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--ink);border-radius:4px;padding:10px 14px;flex-wrap:wrap}
+details.sec>summary:hover{border-color:var(--ink-2);border-left-color:var(--ink)}
+details.sec>summary h2{font-size:21px}
+details.sec[open]>summary{background:var(--ink);color:var(--sheet)}
+details.sec[open]>summary .code{color:var(--sheet);border-color:var(--sheet)}
+details.sec[open]>summary .sfig{color:var(--sheet)}
+details.sec[open]>summary::after{border-color:var(--sheet)}
+.sec-first{margin-top:24px!important}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary .code{font-family:var(--f-mono);font-size:12px;color:var(--ink-2);border:1px solid var(--ink-2);padding:1px 6px;border-radius:2px}
+details.sec>summary .sfig{margin-left:auto;font-family:var(--f-mono);font-size:14px;color:var(--ink-2)}
+details.sec>summary::after{content:"";width:8px;height:8px;border-right:1.5px solid var(--ink-2);border-bottom:1.5px solid var(--ink-2);transform:rotate(45deg) translateY(-3px);margin-left:4px}
+details.sec:not([open])>summary::after{transform:rotate(-45deg)}
+details.sec:not([open])>summary .sfig{color:var(--ink)}
+.body{padding-top:14px;display:flex;flex-direction:column;gap:12px}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;padding:14px 16px}
+.panel>h3{margin-bottom:10px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+
+/* Name bar */
+.namebar{margin-top:14px;display:grid;grid-template-columns:minmax(0,1fr);gap:12px;background:var(--sheet);border:1.5px solid var(--ink);border-radius:4px;padding:12px 14px}
+.namebar .nm-in{font-family:var(--f-disp);font-size:24px;font-weight:600;padding:6px 10px}
+.namebar .nm-in::placeholder{color:var(--ink-3);font-weight:500}
+.namebar .nm-in.need{outline:2px solid var(--red);outline-offset:1px}
+@media (max-width:640px){.namebar{grid-template-columns:minmax(0,1fr)}}
+.start-hint{margin:10px 0 0;padding:10px 14px;border-left:4px solid var(--con);background:color-mix(in srgb,var(--con) 10%,var(--sheet));border-radius:3px;font-size:14px}
+body.empty details.sec:not(.sec-first) .sfig,body.empty #mbar b{visibility:hidden}
+/* Projects */
+.projects{margin-top:14px;background:var(--sheet);border:1.5px solid var(--ink);border-radius:4px}
+.projects>summary{list-style:none;cursor:pointer;padding:10px 14px;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.projects>summary::-webkit-details-marker{display:none}
+.projects>summary b{font-family:var(--f-disp);text-transform:uppercase;letter-spacing:.08em;font-size:15px}
+.pj-cur{font-weight:600}
+.pj-state{margin-left:auto;font-family:var(--f-mono);font-size:12.5px;color:var(--ink-2)}
+.pj-state.dirty{color:var(--red)}.pj-state.ok{color:var(--good)}
+.projects .inner{padding:0 14px 14px;display:flex;flex-direction:column;gap:10px}
+.projects input[type=search]{font:inherit;font-size:14px;color:var(--ink);background:var(--field);border:1px solid var(--rule);border-radius:3px;padding:6px 8px;flex:1 1 180px;min-width:0}
+.pj-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;max-height:360px;overflow:auto}
+.pj-item{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:2px;border:1px solid var(--rule);border-radius:3px;padding:9px 11px;background:color-mix(in srgb,var(--paper) 35%,var(--sheet))}
+.pj-item:hover{border-color:var(--ink-2)}.pj-item:focus-visible{outline:2px solid var(--design)}
+.pj-item.on{border-color:var(--ink);border-left:4px solid var(--con)}
+.pj-item b{font-weight:600;font-size:14.5px}.pj-item span{font-family:var(--f-mono);font-size:12px;color:var(--ink-2)}
+.log{font-family:var(--f-mono);font-size:12.5px;display:flex;flex-direction:column;gap:3px;max-height:320px;overflow:auto}
+.log .ok{color:var(--good)}.log .miss{color:var(--ink-3)}.log .bad{color:var(--red)}
+
+/* Setup */
+.setup{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:760px){.setup{grid-template-columns:minmax(0,1fr)}}
+.flag{border-left:3px solid var(--red);padding:6px 10px;background:color-mix(in srgb,var(--red) 8%,var(--sheet));font-size:13.5px}
+.flag.ok{border-color:var(--good);background:color-mix(in srgb,var(--good) 8%,var(--sheet))}
+.kv{display:flex;justify-content:space-between;gap:10px;font-family:var(--f-mono);font-size:13.5px;border-top:1px solid var(--rule-2);padding-top:7px}
+.kv strong{font-weight:500;font-size:16px}
+.wkgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.wkgrid .lbl{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wkgrid .grp{grid-column:1/-1;font-family:var(--f-disp);text-transform:uppercase;letter-spacing:.1em;font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between;border-bottom:1px solid var(--rule-2);padding-bottom:2px;margin-top:4px}
+.mgrp{border-left:3px solid var(--c);padding-left:10px;display:flex;flex-direction:column;gap:6px}
+.mgrp .mh{font-family:var(--f-disp);text-transform:uppercase;letter-spacing:.08em;font-size:14px;font-weight:600}
+.minidet>summary{cursor:pointer;font-family:var(--f-disp);text-transform:uppercase;letter-spacing:.08em;font-size:13px;color:var(--ink-2)}
+.minidet[open]>summary{margin-bottom:8px}
+
+.mods{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:1100px){.mods{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){.mods{grid-template-columns:minmax(0,1fr)}}
+.mod .lv{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.mod .lv b{font-family:var(--f-mono);font-weight:500;font-size:14px;white-space:nowrap}
+.pips{display:flex;gap:4px;margin-top:4px}.pips i{flex:1;height:6px;border-radius:1px;background:var(--rule-2)}.pips i.on{background:var(--red)}
+.exp-go{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 14px;border-left:4px solid var(--con);background:color-mix(in srgb,var(--con) 10%,var(--sheet));border-radius:3px;font-size:14px}
+.exp-go span{flex:1 1 300px}
+/* Top-down estimate */
+.gutbar{border-left:4px solid var(--design);display:flex;flex-direction:column;gap:12px}
+.gutbar .gb-head{display:flex;flex-direction:column;gap:4px}
+.gutbar .gb-head h3{color:var(--ink);margin:0}
+.gb-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 16px;align-items:end}
+@media (max-width:900px){.gb-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.gb-grid{grid-template-columns:minmax(0,1fr)}}
+.gutbar .gb-out strong{font-size:18px}
+body.empty .gb-out{display:none}
+.group-h{display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap}
+.group-h .chip{font-family:var(--f-disp);text-transform:uppercase;letter-spacing:.1em;font-size:13px;color:var(--sheet);padding:2px 8px;border-radius:2px}
+.group-h .tot{margin-left:auto;font-family:var(--f-mono);font-size:13px;color:var(--ink-2)}
+/* Gut */
+.gut{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:820px){.gut{grid-template-columns:1fr}}
+.pair{display:grid;grid-template-columns:1fr 80px;gap:10px;align-items:end}
+
+/* Phase rows */
+.ph{display:grid;grid-template-columns:165px 168px 1fr 1fr 96px 140px;grid-template-areas:"name wk lead fte mtg out";gap:16px;align-items:center;background:var(--sheet);border:1px solid var(--rule);border-left:6px solid var(--c);border-radius:3px;padding:11px 14px}
+.ph.off{opacity:.5}
+.ph .wk{grid-area:wk}.ph .wk small{display:block;font-family:var(--f-mono);font-size:11px;color:var(--ink-3);margin-top:2px;white-space:nowrap}
+.ph .nm{grid-area:name}.ph .ld{grid-area:lead}.ph .ft{grid-area:fte}.ph .mt{grid-area:mtg}.ph .out{grid-area:out}
+.ph-name{display:flex;gap:8px;align-items:flex-start;font-weight:700;line-height:1.2;cursor:pointer}
+.ph-name small{display:block;font-weight:400;color:var(--ink-2);font-size:12.5px;margin-top:2px}
+.mt{display:flex;gap:6px;align-items:center;font-size:13.5px;color:var(--ink-2);cursor:pointer}
+.out{text-align:right;font-family:var(--f-mono);display:flex;flex-direction:column}
+.out span{font-size:12px;color:var(--ink-2)}
+.out strong{font-weight:500;font-size:16px}
+@media (max-width:900px){.ph{grid-template-columns:1fr 1fr;grid-template-areas:"name out" "wk wk" "lead fte" "mtg mtg";gap:10px 14px}}
+@media (max-width:520px){.ph{grid-template-columns:1fr auto;grid-template-areas:"name out" "wk wk" "lead lead" "fte fte" "mtg mtg"}.ph .wk{max-width:none}}
+.spec{display:flex;gap:14px;align-items:center;flex-wrap:wrap;border-left:6px solid var(--ph-spec)}
+.spec .amt{width:120px}
+.spec .out{margin-left:auto}
+
+/* CA */
+.ca{border-left:6px solid var(--con)}
+.ca-head{display:grid;grid-template-columns:200px 1fr 1fr 150px;gap:16px;align-items:center}
+@media (max-width:900px){.ca-head{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.ca-head{grid-template-columns:1fr}}
+.stages{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+@media (max-width:900px){.stages{grid-template-columns:1fr}}
+.stage{border:1px solid var(--rule);border-top:4px solid var(--c);border-radius:3px;padding:12px;display:flex;flex-direction:column;gap:10px;background:color-mix(in srgb,var(--paper) 40%,var(--sheet))}
+.stage .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.brk{font-size:12.5px}.brk td{padding:3px 4px;border-bottom:1px solid var(--rule-2)}
+.brk td:first-child{white-space:nowrap}.brk i{display:inline-block;width:9px;height:9px;border-radius:1px;margin-right:6px;vertical-align:0}
+.brk tr.hl td{font-weight:600}
+.ca-split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.ca-split>div{border:1px solid var(--rule);border-left:4px solid var(--c);border-radius:3px;padding:8px 10px;font-size:13px}
+.ca-split b{font-family:var(--f-disp);text-transform:uppercase;letter-spacing:.06em;font-size:13.5px;display:block}
+.ca-split .mono{font-size:12.5px;color:var(--ink-2)}
+@media (max-width:520px){.ca-split{grid-template-columns:1fr}}
+.stage .top b{font-family:var(--f-disp);text-transform:uppercase;letter-spacing:.06em;font-size:15px}
+.site-row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr);align-items:end;gap:10px 14px;padding:12px 14px;background:var(--sheet);border:1px solid var(--rule);border-left:6px solid var(--ca-sv);border-radius:3px}
+
+.site-row .sr-h{grid-column:1/-1;font-family:var(--f-disp);text-transform:uppercase;letter-spacing:.08em;font-size:14px}
+.site-row .sr-sv{grid-column:1/-1}.site-row .sr-sv .g2{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:640px){.site-row .sr-sv .g2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.site-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.site-row>div:first-child{grid-column:1/-1}}
+.ca-sub{display:grid;grid-template-columns:200px 1fr 1fr 150px;gap:12px 16px;margin-top:12px;align-items:end}
+@media (max-width:900px){.ca-sub{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.ca-sub>div{grid-column:auto!important;grid-row:auto!important}}
+@media (max-width:560px){.ca-sub{grid-template-columns:minmax(0,1fr)}}
+.ca-totals{margin-top:12px;display:flex;flex-direction:column;gap:6px;overflow-x:auto;min-width:0}
+@media (max-width:600px){.ca-totals td:nth-child(3){display:none}.ca-totals td{white-space:normal}}
+.ca-totals a{color:var(--design)}
+.ca-totals .brk{font-size:13.5px}.ca-totals .brk td{padding:5px 6px}
+.ca-totals tr.tot td{border-top:1px solid var(--ink);font-weight:600}
+.ca-foot{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-top:14px}
+@media (max-width:900px){.ca-foot{grid-template-columns:1fr}}
+.gauge{position:relative;height:34px;margin-top:22px;background:var(--rule-2);border-radius:2px}
+.gauge .band{position:absolute;top:0;bottom:0;background:color-mix(in srgb,var(--good) 28%,var(--sheet));border-left:1px solid var(--good);border-right:1px solid var(--good)}
+.gauge .mk{position:absolute;top:-6px;bottom:-6px;width:3px;background:var(--ink);transform:translateX(-1.5px)}
+.gauge .mk.g{background:var(--ink-3);width:2px}
+.gauge .mk span{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-family:var(--f-mono);font-size:11.5px;white-space:nowrap;padding-bottom:2px}
+.gauge .tick{position:absolute;top:100%;font-family:var(--f-mono);font-size:11px;color:var(--ink-3);transform:translateX(-50%);padding-top:3px}
+
+/* Charts */
+.hist svg{width:100%;height:auto;display:block}
+.chartbox{overflow-x:auto}
+.cmp{display:grid;grid-template-columns:1.1fr 1fr;gap:12px}
+@media (max-width:900px){.cmp{grid-template-columns:1fr}}
+.bars{display:flex;flex-direction:column;gap:14px}
+.bar-row .bl{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:4px;gap:8px}
+.bar-row .bl b{font-family:var(--f-mono);font-weight:500}
+.track{height:26px;display:flex;background:var(--rule-2);border-radius:2px;overflow:hidden}
+.track div{height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:11.5px;color:var(--sheet);white-space:nowrap;overflow:hidden;min-width:0}
+.legend{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2)}
+.legend i{display:inline-block;width:10px;height:10px;margin-right:5px;vertical-align:-1px;border-radius:1px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--rule-2);text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;font-family:var(--f-body);white-space:normal}
+thead th{font-family:var(--f-disp);font-weight:500;text-transform:uppercase;letter-spacing:.08em;font-size:12.5px;color:var(--ink-2);border-bottom:1px solid var(--ink)}
+tr.tot td{border-top:1px solid var(--ink);font-weight:600}
+.delta-pos{color:var(--red)}.delta-neg{color:var(--good)}
+.tablebox{overflow-x:auto}
+
+/* RAIC */
+#raic-chart{width:100%;height:auto;display:block;min-width:600px}
+.raic{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr);gap:12px}
+@media (max-width:900px){.raic{grid-template-columns:minmax(0,1fr)}}
+.fac{display:grid;grid-template-columns:1fr 68px;gap:6px 10px;align-items:center;font-size:13.5px}
+.fac input[type=number]{padding:3px 6px;font-size:13px}
+.verdict{font-size:14px;border-left:3px solid var(--ink-2);padding:6px 10px;background:color-mix(in srgb,var(--ink) 4%,var(--sheet))}
+/* Consultants */
+.cons-row{display:grid;grid-template-columns:1fr 140px 80px 80px 34px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--rule-2)}
+.cons-row .mono{font-size:13px;color:var(--ink-2);text-align:right}
+.cons-row button{padding:4px 0;width:34px;border-color:var(--rule);color:var(--ink-3)}
+.cons-head{font-family:var(--f-disp);text-transform:uppercase;letter-spacing:.08em;font-size:12.5px;color:var(--ink-2);border-bottom:1px solid var(--ink)}
+.cons-head span:nth-child(n+3){text-align:right}
+@media (max-width:560px){.cons-row{grid-template-columns:1fr 110px 34px}.cons-row .mono,.cons-head span:nth-child(3),.cons-head span:nth-child(4){display:none}}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.settings{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+footer{margin-top:36px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-top:1.5px solid var(--ink);padding-top:12px}
+footer .note{flex:1 1 300px}
+.toast{font-family:var(--f-mono);font-size:13px;color:var(--good)}
+
+/* Phone summary bar */
+#mbar{display:none}
+@media (max-width:999px){
+  #mbar{display:grid;grid-template-columns:repeat(3,1fr);position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--ink);color:var(--sheet);padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px));gap:10px}
+  #mbar div{display:flex;flex-direction:column;min-width:0}
+  #mbar span{font-family:var(--f-disp);text-transform:uppercase;letter-spacing:.08em;font-size:11px;opacity:.75}
+  #mbar b{font-family:var(--f-mono);font-weight:500;font-size:15px;white-space:nowrap}
+  body{padding-block-end:96px}
+}
+@media (prefers-reduced-motion:no-preference){.track div{transition:width .25s ease}.gauge .mk{transition:left .25s ease}}
+</style>
+
+<div class="wrap">
+
+<header class="tb" aria-label="Fee summary">
+  <div>
+    <span class="brand">zzap architecture + planning · fee builder</span>
+    <span class="sub" id="tb-sub"></span>
+  </div>
+  <div><span class="lbl">Construction</span><span class="fig" id="tb-budget"></span><span class="sub" id="tb-range"></span></div>
+  <div><span class="lbl">Top-down fee</span><span class="fig" id="tb-gut"></span><span class="sub" id="tb-gutpct"></span></div>
+  <div><span class="lbl">Expanded fee</span><span class="fig" id="tb-exp"></span><span class="sub" id="tb-exppct"></span></div>
+  <div><span class="lbl">CA per month</span><span class="fig" id="tb-ca"></span><span class="sub" id="tb-caband"></span></div>
+  <div><span class="lbl">Variance</span><span class="fig" id="tb-var"></span><span class="sub" id="tb-split"></span></div>
+</header>
+
+<!-- PROJECT NAME -->
+<div class="namebar">
+  <div><span class="lbl">Project name</span><input type="text" class="nm-in" id="nm-in" data-k="name" placeholder="Name this project" aria-label="Project name"></div>
+</div>
+
+<p class="start-hint" id="start-hint" hidden>Start by entering the building type and size (or the client budget) in <b>01 Project setup</b>. Fee figures appear once the project has a size.</p>
+
+<!-- PROJECTS -->
+<details class="projects" id="projects">
+  <summary><b>Projects</b><span class="pj-cur" id="pj-cur"></span><span class="pj-state" id="pj-state"></span></summary>
+  <div class="inner">
+    <div class="actions">
+      <button type="button" class="solid" id="pj-save">Save</button>
+      <button type="button" id="pj-saveas">Save as new</button>
+      <button type="button" class="quiet" id="pj-new">New project</button>
+      <button type="button" class="quiet" id="pj-del">Delete</button>
+      <input type="search" id="pj-q" placeholder="Search saved projects" aria-label="Search saved projects">
+    </div>
+    <div class="pj-list" id="pj-list"></div>
+    <p class="note" id="pj-note">Connecting to saved projects…</p>
+  </div>
+</details>
+
+<!-- 01 SETUP -->
+<details class="sec sec-first">
+  <summary><span class="code">01</span><h2>Project setup</h2><span class="sfig" id="sf-setup"></span></summary>
+  <div class="body">
+  <div class="panel stack">
+    <h3>Building</h3>
+    <div><span class="lbl">Project type <span class="ref" data-ref="type"></span></span>
+      <select data-k="budget.type" id="type-sel"></select></div>
+    <div class="g2">
+      <div><span class="lbl"><span id="qty-lbl">Units</span> <span class="ref" data-ref="quantity"></span></span><input type="number" min="0" step="1" data-k="budget.qty" placeholder="Enter size"></div>
+      <div id="gfa-box"><span class="lbl">Gross floor area (sf) <span class="ref" data-ref="gfa"></span></span><input type="number" min="0" step="100" data-k="budget.gfa" placeholder="optional"></div>
+    </div>
+    <div><span class="lbl"><span id="rate-lbl">$ / unit</span> <b id="rate-val"></b></span><input type="range" id="rate-rng" data-k="budget.rate"><div class="scale"><span id="rate-lo"></span><span id="rate-hi"></span></div></div>
+    <div><span class="lbl">Client / RFP construction budget <span class="ref" data-ref="client budget"></span></span><input type="number" min="0" step="10000" data-k="budget.override" placeholder="0 = use the estimate above"></div>
+    <div class="kv"><span id="bud-calc"></span><strong id="bud-use"></strong></div>
+    <div id="bud-flag" class="flag" hidden></div>
+    <div id="altus-box" style="border-top:1px solid var(--rule-2);padding-top:10px;margin-top:2px;display:flex;flex-direction:column;gap:8px">
+      <span class="lbl">Altus 2026 Halifax benchmark <span class="ref" data-ref="altus"></span></span>
+      <div id="altus-sub-box" hidden><span class="lbl">Altus category</span><select data-k="budget.altusSub" id="altus-sub-sel"></select></div>
+      <div class="kv"><span id="altus-calc"></span><strong id="altus-range"></strong></div>
+      <div id="altus-flag" class="flag" hidden></div>
+      <p class="note" id="altus-note" style="font-size:12px"></p>
+    </div>
+  </div>
+  <div class="panel gutbar" id="gutbar">
+    <div class="gb-head"><h3>Top-down estimate</h3><p class="note">If left uninterrupted, how long would an experienced team member take to complete the design, and how long will construction realistically take?</p></div>
+    <div class="gb-grid">
+      <div><span class="lbl">Design, months at 1 FTE</span><input type="number" min="0" step="0.5" data-k="gut.designMonths" placeholder="–" aria-label="Design months at one FTE"></div>
+      <div><span class="lbl">Construction, months</span><input type="number" min="0" step="1" data-k="gut.conMonths" placeholder="–" aria-label="Construction months"></div>
+      <div><span class="lbl">Construction involvement (FTE)</span><input type="number" min="0.05" max="1" step="0.05" data-k="gut.conFte" aria-label="Construction FTE"></div>
+      <div><span class="lbl">Senior mix <b id="g-rate"></b></span><input type="range" min="0" max="100" step="5" data-k="gut.lead" list="leadticks" aria-label="Top-down estimate senior involvement"><div class="scale"><span>Minor</span><span>Balanced</span><span>High</span></div></div>
+    </div>
+    <div class="kv gb-out"><span id="g-sub"></span><strong id="g-tot"></strong></div>
+  </div>
+  </div>
+</details>
+
+<!-- 03 PHASES -->
+<details class="sec" id="sec-phases">
+  <summary><span class="code">02</span><h2>Phases: schedule and effort</h2><span class="sfig" id="sf-phases"></span></summary>
+  <div class="body">
+  <div class="exp-go" id="exp-go"><span>The expanded fee stays hidden until you work through the phases. Adjust any value below, or accept the standard assumptions.</span><button type="button" class="solid" id="exp-accept">Use these phase assumptions</button></div>
+  <p class="note">One row per phase: weeks from the RFP or client schedule, then senior mix and staffing. Tick “Client meetings (virtual)” on phases that carry client meetings, at the frequency set in 07 Rates and assumptions.</p>
+  <div class="group-h"><span class="chip" style="background:var(--design)">Design</span><span class="tot" id="wk-d"></span></div>
+  <div class="stack" id="ph-design"></div>
+  <div class="panel spec">
+    <label class="chk"><input type="checkbox" data-k="spec.three"><span><b>Three-part specification</b> <span class="ref" data-ref="specs"></span><br><small class="note">External spec writer. Leave unticked for internal specs (no change to the fee).</small></span></label>
+    <div class="amt"><span class="lbl">Spec writer $</span><input type="number" min="0" step="500" data-k="spec.amt"></div>
+    <div class="out"><span id="spec-lbl"></span><strong id="spec-fee"></strong></div>
+  </div>
+
+  <div class="group-h" style="margin-top:14px"><span class="chip" style="background:var(--con)">Construction</span><span class="tot" id="wk-c"></span></div>
+  <div class="stack" id="ph-tender"></div>
+
+  <div class="panel ca" id="ca">
+    <div class="ca-head">
+      <label class="ph-name"><input type="checkbox" data-k="ca.on"><span>Contract administration<small>Totals for the whole CA period, then RFIs and coordination by stage</small></span></label>
+      <div><span class="lbl">CA senior involvement <b id="ca-rate"></b></span><input type="range" min="0" max="100" step="5" data-k="ca.lead" list="leadticks" aria-label="CA senior involvement"><div class="scale"><span>Minor</span><span>Balanced</span><span>High</span></div></div>
+      <div><span class="lbl">Shop drawings (total)<span class="ref" data-ref="shop drawings"></span> <b id="ca-sd-v"></b></span><input type="range" min="0" max="60" step="1" data-k="ca.sdTotal" aria-label="Total shop drawings"><div class="scale"><span>0</span><span>typical 10–40</span><span>60</span></div></div>
+      <label class="mt" style="justify-self:end"><input type="checkbox" data-k="ca.mtg">Client meetings (virtual)</label>
+    </div>
+    <div class="ca-sub">
+      <div style="grid-column:3;grid-row:1"><span class="lbl">How many site visits<span class="ref" data-ref="site visits"></span> <b id="ca-sv-v"></b></span><input type="range" min="0" max="60" step="1" data-k="ca.svTotal" aria-label="Number of site visits"><div class="scale"><span>0</span><span>30</span><span>60</span></div></div>
+      <div style="grid-column:2;grid-row:1"><span class="lbl">Travel time per visit, return<span class="ref" data-ref="km return"></span> <b id="ca-tr-v"></b></span><input type="range" min="1" max="8" step="0.25" data-k="travel.hrs" aria-label="Return travel hours"><div class="scale"><span>1 h</span><span>4 h</span><span>8 h</span></div></div>
+      <div class="out" style="grid-column:2;grid-row:2;text-align:left"><span id="ca-hrs"></span><strong id="ca-fee"></strong></div>
+    </div>
+    <div class="ca-totals">
+      <table class="brk"><tbody id="ca-tot"></tbody></table>
+    </div>
+    <div class="stages" id="stages"></div>
+    <div class="ca-foot">
+      <div>
+        <h3>Where CA time goes</h3>
+        <div class="track" id="ca-mix" style="margin-top:8px;height:28px"></div>
+        <div class="legend" id="ca-mix-leg" style="margin-top:8px"></div>
+        <p class="note" style="margin-top:10px">Shop drawings at half a day each, meetings and site visits are totals for the whole CA period. RFIs, change orders, substitutions and general coordination are days per week and vary by stage.</p>
+      </div>
+      <div>
+        <h3>Average monthly CA</h3>
+        <div class="gauge" id="gauge"></div>
+        <p class="note" id="ca-verdict" style="margin-top:26px"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="stack" id="ph-warr"></div>
+
+  <div class="panel hist">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px"><h3>Staffing over the schedule</h3><span class="sub" id="hist-sum"></span></div>
+    <div class="chartbox"><svg id="hist" viewBox="0 0 820 230" role="img" aria-label="Staffing histogram of FTE by week"></svg></div>
+  </div>
+  </div>
+</details>
+
+<!-- 02 STRATEGY -->
+<details class="sec" id="sec-strategy">
+  <summary><span class="code">03</span><h2>Strategy modifiers</h2><span class="sfig" id="sf-mod"></span></summary>
+  <div class="body">
+  <p class="note">Extra effort for the kind of project this is; the four modifiers stack. <b>Client</b> and <b>coordination</b>: 1 adds nothing, 5 adds <span id="mod-max-txt"></span> h a week to every phase in scope at that phase's rate. <b>Approvals</b>: each level above 1 adds a review period after SD, DD and CD (schedule risk). <b>Redesign</b>: each level above 1 adds <span id="rd-step-txt"></span>% of SD, DD and CD effort as a rework allowance.</p>
+  <div class="mods" id="mods"></div>
+  <div class="panel">
+    <div class="kv" style="border:0;padding:0"><span id="mod-sum"></span><strong id="mod-fee"></strong></div>
+    <div class="kv" id="rev-line" style="margin-top:8px"><span id="rev-sum"></span><strong id="rev-fee"></strong></div>
+    <p class="note" style="margin-top:8px">Review periods and the strategy allowance apply automatically to both the expanded fee and the top-down estimate — there's nothing to toggle.</p>
+  </div>
+  </div>
+</details>
+
+<!-- 05 COMPARE -->
+<details class="sec">
+  <summary><span class="code">04</span><h2>Method comparison</h2><span class="sfig" id="sf-cmp"></span></summary>
+  <div class="body">
+  <div class="cmp">
+    <div class="panel">
+      <div class="bars" id="cmp-bars"></div>
+      <div class="legend" style="margin-top:12px"><span><i style="background:var(--design)"></i>Design phases</span><span><i style="background:var(--con)"></i>Construction phases</span></div>
+      <h3 style="margin-top:22px">Expanded fee by phase</h3>
+      <div class="track" id="dist" style="margin-top:8px;height:30px"></div>
+      <div class="legend" id="dist-leg" style="margin-top:8px"></div>
+    </div>
+    <div class="panel tablebox">
+      <table>
+        <thead><tr><th></th><th>Top-down</th><th>Expanded</th><th>Δ</th></tr></thead>
+        <tbody id="cmp-table"></tbody>
+      </table>
+      <p class="note" id="cmp-note" style="margin-top:12px"></p>
+    </div>
+  </div>
+  </div>
+</details>
+
+<!-- 06 CONSULTANTS -->
+<details class="sec">
+  <summary><span class="code">05</span><h2>Design team fees</h2><span class="sfig" id="sf-cons"></span></summary>
+  <div class="body">
+  <div class="cmp">
+    <div class="panel">
+      <div class="cons-row cons-head"><span>Consultant <span class="ref" data-ref="consultants"></span></span><span>Fee</span><span>% const.</span><span>vs arch.</span><span></span></div>
+      <div id="cons-list"></div>
+      <div class="actions" style="margin-top:12px"><button type="button" id="cons-add">Add consultant</button>
+        <label class="mt" style="margin-left:auto">Architectural fee basis
+          <select data-k="consBasis" style="width:auto"><option value="exp">Expanded</option><option value="gut">Top-down estimate</option></select></label></div>
+    </div>
+    <div class="panel">
+      <h3>Share of design team fee</h3>
+      <div class="track" id="cons-bar" style="height:32px"></div>
+      <div class="legend" id="cons-leg" style="margin-top:8px"></div>
+      <table style="margin-top:16px"><tbody id="cons-table"></tbody></table>
+    </div>
+  </div>
+  </div>
+</details>
+
+<!-- 08 RAIC -->
+<details class="sec">
+  <summary><span class="code">06</span><h2>RAIC benchmark</h2><span class="sfig" id="sf-raic"></span></summary>
+  <div class="body">
+  <p class="note">From the RAIC's <i>A Guide to Determining Appropriate Fees for the Services of an Architect</i> (2019), Tables 1, 5 and 6. The guide's percentages cover basic services from schematic design through contract administration, for design-bid-build. Predesign and warranty are therefore left out of our side of the comparison.</p>
+  <div class="raic">
+    <div class="panel stack">
+      <div><span class="lbl">RAIC building category</span><select data-k="raic.cat" id="raic-cat"></select></div>
+      <div class="g2">
+        <div><span class="lbl">Fee basis</span><select data-k="raic.basis"><option value="arch">Architecture only (Table 5)</option><option value="eng">Arch. + basic engineering (Table 6)</option></select></div>
+        <div><span class="lbl">Complexity</span><select data-k="raic.cx"><option value="0.85">Simple (×0.85)</option><option value="1">Average</option><option value="1.15">Complex (×1.15)</option></select></div>
+      </div>
+      <div>
+        <span class="lbl" style="margin-bottom:6px">Fee adjustment factors (added together)</span>
+        <div class="fac" id="raic-fac"></div>
+      </div>
+      <div class="kv"><span id="raic-base"></span><strong id="raic-pct"></strong></div>
+      <div class="kv"><span>RAIC recommended fee (national)</span><strong id="raic-fee"></strong></div>
+      <div class="g2" style="align-items:end"><div><span class="lbl">Halifax market factor</span><input type="number" min="0.5" max="1.2" step="0.05" data-k="raic.hfx"></div><p class="note" id="raic-hfx-note"></p></div>
+      <div class="kv"><span>Halifax-adjusted benchmark</span><strong id="raic-hfx"></strong></div>
+      <p class="note" id="raic-band"></p>
+    </div>
+    <div class="panel stack">
+      <h3>Established ranges at this construction value</h3>
+      <div class="chartbox"><svg id="raic-chart" viewBox="0 0 760 330" role="img" aria-label="RAIC fee ranges by building category compared with this fee"></svg></div>
+      <div class="legend"><span><i style="background:color-mix(in srgb,var(--ink-3) 45%,var(--sheet))"></i>Simple to complex range</span><span><i style="background:var(--ink)"></i>Average</span><span><i style="background:var(--red);height:3px;vertical-align:3px"></i>Expanded (comparable)</span><span><i style="background:var(--design);height:3px;vertical-align:3px"></i>Top-down estimate</span><span><i style="background:var(--con)"></i>RAIC adjusted</span><span><i style="background:var(--good)"></i>Halifax-adjusted</span></div>
+      <p class="verdict" id="raic-verdict"></p>
+    </div>
+  </div>
+  <div class="panel tablebox">
+    <h3>Phase split against RAIC Table 1</h3>
+    <table style="margin-top:8px"><thead><tr><th>Phase</th><th>RAIC typical</th><th>RAIC early-intensive / BIM</th><th>Expanded</th><th>RAIC $</th><th>Expanded $</th></tr></thead><tbody id="raic-split"></tbody></table>
+    <p class="note" id="raic-split-note" style="margin-top:10px"></p>
+  </div>
+  </div>
+</details>
+
+<!-- 07 SETTINGS -->
+<details class="sec">
+  <summary><span class="code">07</span><h2>Rates and assumptions</h2><span class="sfig" id="sf-set"></span></summary>
+  <div class="body">
+  <div class="panel settings">
+    <div><span class="lbl">Production rate ($/h)</span><input type="number" min="0" step="5" data-k="rateLo"></div>
+    <div><span class="lbl">Leadership rate ($/h)</span><input type="number" min="0" step="5" data-k="rateHi"></div>
+    <div><span class="lbl">Hours per FTE week</span><input type="number" min="1" step="0.5" data-k="hpw"></div>
+    <div><span class="lbl">Mileage ($/km)</span><input type="number" min="0" step="0.01" data-k="mileage"></div>
+    <div><span class="lbl">CA monthly, low ($)</span><input type="number" min="0" step="250" data-k="caLo"></div>
+    <div><span class="lbl">CA monthly, high ($)</span><input type="number" min="0" step="250" data-k="caHi"></div>
+    <div><span class="lbl">Modifier at level 5 (h/wk)</span><input type="number" min="0" step="0.25" data-k="mods.max"></div>
+    <div><span class="lbl">Review wks per approvals level</span><input type="number" min="0" step="0.5" data-k="mods.revStep"></div>
+    <div><span class="lbl">Holding effort in review (FTE)</span><input type="number" min="0" step="0.05" data-k="mods.hold"></div>
+    <div><span class="lbl">Redesign % per level</span><input type="number" min="0" step="1" data-k="mods.rdStep"></div>
+    <div><span class="lbl">Days per shop drawing</span><input type="number" min="0" step="0.25" data-k="ca.sdDays"></div>
+    <div><span class="lbl">Design meeting frequency</span><select data-k="meet.design.every"><option value="1">Weekly</option><option value="2">Biweekly</option><option value="4">Monthly</option><option value="0">None</option></select></div>
+    <div><span class="lbl">Design meeting, hrs</span><input type="number" min="0" step="0.25" data-k="meet.design.remHrs"></div>
+    <div><span class="lbl">Design meeting, staff</span><input type="number" min="1" step="1" data-k="meet.design.people"></div>
+    <div><span class="lbl">Construction meeting frequency</span><select data-k="meet.con.every"><option value="1">Weekly</option><option value="2">Biweekly</option><option value="4">Monthly</option><option value="0">None</option></select></div>
+    <div><span class="lbl">Construction meeting, hrs</span><input type="number" min="0" step="0.25" data-k="meet.con.remHrs"></div>
+    <div><span class="lbl">Construction meeting, staff</span><input type="number" min="1" step="1" data-k="meet.con.people"></div>
+  </div>
+  <p class="note">Senior involvement blends the production and leadership rates: 0% is all production staff, 100% is all leadership. One FTE month is hours per week × 52 ÷ 12; one day is a fifth of an FTE week. Client meetings are assumed virtual; tick “Client meetings (virtual)” on each phase or on contract administration to include them at the frequency set here.</p>
+  </div>
+</details>
+
+<footer>
+  <button type="button" id="copy">Copy summary</button>
+  <button type="button" class="quiet" id="reset">Clear project</button>
+  <span class="toast" id="toast" role="status"></span>
+  <p class="note">Opens blank with zzap's standard assumptions (10-month design, 18-month CA). Use Projects at the top to save your work so you can open it again later, or on another device.</p>
+</footer>
+</div>
+
+<div id="mbar" aria-hidden="true">
+  <div><span>Construction</span><b id="mb-bud"></b></div>
+  <div><span>Expanded fee</span><b id="mb-exp"></b></div>
+  <div><span>CA / month</span><b id="mb-ca"></b></div>
+</div>
+
+<datalist id="leadticks"><option value="0"></option><option value="50"></option><option value="100"></option></datalist>
+
+<script>
+const TYPES=[
+ {id:'wood',name:'Multi-res, wood frame',unit:'unit',qtyLbl:'Units',lo:330000,hi:450000,step:5000,def:385000,qty:40},
+ {id:'noncomb',name:'Multi-res, non-combustible',unit:'unit',qtyLbl:'Units',lo:420000,hi:560000,step:5000,def:485000,qty:60},
+ {id:'ltc',name:'Long-term care',unit:'bed',qtyLbl:'Beds',lo:600000,hi:800000,step:5000,def:700000,qty:48},
+ {id:'health',name:'Healthcare',unit:'sf',qtyLbl:'Area (sf)',lo:850,hi:1200,step:10,def:1000,qty:20000},
+ {id:'fitup',name:'Interior fit-up',unit:'sf',qtyLbl:'Area (sf)',lo:150,hi:300,step:5,def:200,qty:5000},
+ {id:'general',name:'General construction',unit:'sf',qtyLbl:'Area (sf)',lo:400,hi:1000,step:10,def:550,qty:20000}
+];
+const SF_RANGE=[400,1000];
+/* Altus Group 2026 Canadian Cost Guide, Halifax column, $/sf, hard construction cost only */
+/* Altus Group 2026 Canadian Cost Guide, Halifax column, $/sf, non-residential only — zzap uses its own local rates for housing */
+const ALTUS_SUB={
+ health:[['clinic','Medical clinic / treatment centre',420,680],['hospital','General hospital / acute care',795,1380]],
+ fitup:[['fitB','Office interior fit-up, Class B',75,125],['fitA','Office interior fit-up, Class A',110,185]],
+ general:[
+  ['off5','Office, under 5 storeys (Class B)',200,260,'Office'],
+  ['off530b','Office, 5–30 storeys (Class B)',205,295,'Office'],
+  ['off530a','Office, 5–30 storeys (Class A)',230,330,'Office'],
+  ['offfitb','Office interior fit-up, Class B',75,125,'Office'],
+  ['offfita','Office interior fit-up, Class A',110,185,'Office'],
+  ['strip','Strip plaza',145,195,'Retail'],
+  ['super','Supermarket',175,235,'Retail'],
+  ['bigbox','Big box store',185,245,'Retail'],
+  ['mall','Enclosed mall',235,335,'Retail'],
+  ['hbudget','Budget hotel',220,270,'Hotels'],
+  ['hsuite','Suite hotel',240,340,'Hotels'],
+  ['h4star','4-star full service hotel',295,380,'Hotels'],
+  ['warehouse','Warehouse',125,195,'Industrial'],
+  ['distrib','Distribution facility',165,430,'Industrial'],
+  ['elem','Elementary school',370,445,'Educational'],
+  ['sec','Secondary school',375,480,'Educational'],
+  ['uteach','University / college, teaching & lecture hall',665,775,'Educational'],
+  ['ulab','University / college, laboratories',770,1120,'Educational'],
+  ['ures','University / college, student residence',335,425,'Educational'],
+  ['clinic','Medical clinic / treatment centre',420,680,'Health care'],
+  ['hospital','General hospital / acute care',795,1380,'Health care'],
+  ['airportreg','Regional airport terminal',400,495,'Transportation'],
+  ['airportintl','International airport terminal',775,955,'Transportation'],
+  ['bus','Bus terminal / garage',325,425,'Transportation'],
+  ['fire','Fire / EMS station',425,515,'Government'],
+  ['policeloc','Police station, local detachment',460,560,'Government'],
+  ['policereg','Police station, regional HQ',485,635,'Government'],
+  ['court','Court house',495,595,'Government'],
+  ['facmaint','Facilities maintenance building',305,355,'Government'],
+  ['penitentiary','Penitentiary',450,615,'Government'],
+  ['muniof','Municipal office (incl. fit-up)',345,400,'Government'],
+  ['library','Library',420,685,'Government'],
+  ['ice','Ice arena',350,400,'Recreation / entertainment'],
+  ['aquatic','Community aquatic facility',660,835,'Recreation / entertainment'],
+  ['multiuse','Multi-use recreational centre',565,695,'Recreation / entertainment'],
+  ['arts','Performing arts building',505,655,'Recreation / entertainment'],
+  ['museum','Museum / gallery',485,630,'Recreation / entertainment']
+ ]
+};
+function altusPick(){
+ const t=S.budget.type;
+ if(t==='wood'||t==='noncomb'||t==='ltc')return null;
+ if(ALTUS_SUB[t]){const row=ALTUS_SUB[t].find(r=>r[0]===S.budget.altusSub)||ALTUS_SUB[t][0];return{label:row[1],lo:row[2],hi:row[3]};}
+ return null;
+}
+const DPH=[
+ {id:'pre',name:'Predesign',sub:'Program, site, code review'},
+ {id:'sd',name:'Schematic design',sub:''},
+ {id:'dd',name:'Design development',sub:'Permit drawings'},
+ {id:'cd',name:'Construction documents',sub:'Contract drawings + specs'}];
+const MODS=[
+ {id:'client',name:'Client complexity',desc:'Demanding or inexperienced client, many user groups, heavy reporting or hand-holding. Adds weekly effort.'},
+ {id:'approvals',name:'Approvals complexity',desc:''},
+ {id:'coord',name:'Coordination / consultants',desc:'Number of consultants, specialist systems, phased or occupied sites, weak consultant team.'},
+ {id:'rev',name:'Redesign / scope creep',desc:'Loose program, funding or scope still moving, likely redesign or re-pricing after a cost estimate. Priced as a share of SD, DD and CD effort, not per week.'}];
+const LVL=['','None','Low','Moderate','High','Very high'];
+const APPROVAL_LVL=['',
+ 'Private owner, one decision-maker.',
+ 'Private owner or developer with a small team, or a lender to satisfy.',
+ 'Non-profit, society or co-op run by a board. Decisions wait for board meetings.',
+ 'Institution or government with departments (health authority, university, municipality, province). Each department reviews.',
+ 'Several public bodies or funding partners, each with its own review and sign-off.'];
+const RAIC_T5={1:[7.14,6.12,5.07,4.78,4.57,4.46,4.18],2:[8.24,7.26,6.70,5.93,5.70,5.41,5.15],3:[8.72,7.93,6.96,6.28,5.99,5.78,5.49],4:[9.45,8.40,7.49,6.93,6.70,6.83,6.09],5:[10.24,9.19,8.14,7.67,7.40,7.04,6.72],6:[10.76,9.45,8.40,7.75,7.28,6.96,6.65],7:[14.18,14.96,13.91,13.26,12.74,12.21,11.69]};
+const RAIC_T6={1:[9.22,8.17,7.85,7.76,7.55,7.34,7.13],2:[10.26,9.39,8.91,8.80,8.60,8.38,8.17],3:[11.32,10.26,9.96,9.85,9.64,9.43,9.22],4:[12.36,11.32,11.00,10.89,10.68,10.47,10.26],5:[13.41,12.36,12.05,11.95,11.74,11.53,11.32],6:[14.45,13.41,13.09,13.00,12.78,12.57,12.36],7:[18.48,17.60,17.28,17.00,16.14,15.46,14.95]};
+const RAIC_BANDS=['under $500k','$500k–$1M','$1M–$2M','$2M–$5M','$5M–$10M','$10M–$25M','$25M–$50M'];
+const RAIC_CAT={1:'Warehouse, storage, sheds',2:'Multi-unit residential, dormitory, townhouse',3:'Office/retail shell, seniors apartments, elementary school',4:'High school, retirement & specialized housing, fire/police, hotel',5:'Arena, daycare, college classroom, town hall, long-term care',6:'Acute & chronic care, clinic, lab, library, courthouse, theatre',7:'Custom residence, tenant space planning, monuments'};
+const TYPE_CAT={wood:2,noncomb:2,ltc:5,health:6,fitup:7,general:3};
+const RAIC_SPLIT=[['Schematic design',12.5,'20–25'],['Design development',12.5,'20–25'],['Construction documents',50,'25–35'],['Bidding / tender',2.5,'2.5'],['Contract administration',22.5,'22.5']];
+const RAIC_FAC=[['fast','Fast-track or compressed schedule',0.10],['appr','Approvals / submittals beyond normal',0.10],['cert','Third-party certification (e.g. LEED)',0.10],['pkgs','Multiple tender packages',0.25],['ctrs','Multiple construction contracts',0.10],['tech','New technologies / systems',0.10],['reno','Renovation or heritage',0.20]];
+const WREF={pre:'predesign weeks',sd:'sd weeks',dd:'dd weeks',cd:'cd weeks',tender:'tender weeks',warr:'warranty'};
+const STAGE_IDS=['ca1','ca2','ca3'];
+const ABBR={pre:'PRE',sd:'SD',dd:'DD',cd:'CD',tender:'TND',ca1:'START',ca2:'CA',ca3:'WRAP',warr:'WAR'};
+
+function example(){return{
+ name:'',location:'',
+ rateLo:160,rateHi:285,hpw:37.5,mileage:0.72,caLo:5000,caHi:7500,consBasis:'exp',
+ budget:{type:'wood',qty:0,rate:385000,gfa:0,override:0,storeys:0,altusSub:'clinic'},
+ travel:{km:50,hrs:1},
+ meet:{design:{every:2,remHrs:1.5,people:2},
+       con:{every:2,remHrs:1.5,people:1}},
+ gut:{designMonths:0,conMonths:0,conFte:0.2,lead:40},
+ phases:{
+  pre:{on:true,weeks:4,lead:55,fte:0.3,mtg:false},
+  sd:{on:true,weeks:9,lead:50,fte:0.5,mtg:true},
+  dd:{on:true,weeks:12,lead:40,fte:0.6,mtg:true},
+  cd:{on:true,weeks:18,lead:25,fte:0.8,mtg:true},
+  tender:{on:true,weeks:6,lead:35,fte:0.3,mtg:false},
+  warr:{on:false,weeks:52,lead:40,fte:0.05,mtg:false}},
+ spec:{three:false,amt:8000},
+ ca:{on:true,lead:25,siteMethod:'count',siteHrs:1.5,sitePeople:1,sdDays:0.5,
+  sdTotal:26,svTotal:19,svEvery:4,mtg:true,
+  stages:[
+   {name:'Kickoff & startup',weeks:12,rfi:0.5},
+   {name:'Intensive CA',weeks:52,rfi:0.5},
+   {name:'Wrap-up & closeout',weeks:14,rfi:0.5}]},
+ mods:{client:2,approvals:3,coord:3,rev:2,max:2.5,gut:false,reviews:true,revStep:1,hold:0.1,rdStep:5},
+ raic:{cat:0,basis:'arch',cx:'1',f:{},hfx:0.85},
+ refs:{},
+ cons:[{name:'Structural',fee:0},{name:'Mechanical',fee:0},{name:'Electrical',fee:0},{name:'Civil',fee:0},{name:'Landscape',fee:0}]
+};}
+const KEY='zzapFeeBuilder.v2';
+function kmFor(h){h=Math.max(0,h||0);return 50*Math.min(h,1)+100*Math.max(h-1,0);}
+function hrsFor(km){km=Math.max(0,km||0);return km<=50?km/50:1+(km-50)/100;}
+function migrate(x){
+ if(!x||!x.ca||!x.ca.stages)x=example();
+ if(!x.mods)x.mods={client:1,coord:1,rev:1,max:2.5,gut:false};
+ if(!x.raic)x.raic={cat:0,basis:'arch',cx:'1',f:{}};
+ if(!x.raic.f)x.raic.f={};
+ if(x.raic.hfx==null)x.raic.hfx=0.85;
+ if(!x.refs)x.refs={};
+ if(!x.travel)x.travel={km:50,hrs:1};if(!(x.travel.hrs>=1))x.travel.hrs=1;x.ca.siteMethod='count';
+ if(x.budget.storeys==null)x.budget.storeys=0;
+ if(!x.budget.altusSub)x.budget.altusSub=(ALTUS_SUB[x.budget.type]&&ALTUS_SUB[x.budget.type][0][0])||'clinic';
+ if(!x.meet)x.meet={design:{every:2,remHrs:1.5,people:2},con:{every:2,remHrs:1.5,people:1}};
+ x.meet.design=Object.assign({every:2,remHrs:1.5,people:2},x.meet.design);x.meet.con=Object.assign({every:2,remHrs:1.5,people:1},x.meet.con);
+ if(x.expSet==null)x.expSet=!!(x.name&&x.name.trim()&&x.budget&&x.budget.qty>0);
+ if(!x.name&&x.gut&&x.gut.designMonths===7&&x.gut.conMonths===18){x.gut.designMonths=0;x.gut.conMonths=0;}
+ if(x.ca.sdTotal==null){const st=x.ca.stages;x.ca.sdTotal=st.reduce((a,z)=>a+(z.sd||0),0);x.ca.svTotal=st.reduce((a,z)=>a+(z.sv||0),0);x.ca.svEvery=(st[1]&&st[1].every)||4;x.ca.mtg=st.some(z=>z.mtg!==false);}
+ if(/^Example/.test(x.name||''))return migrate(example());
+ if(x.budget.gfa===38000&&/^Example/.test(x.name||''))x.budget.gfa=0;
+ x.mods=Object.assign({approvals:1,reviews:true,revStep:1,hold:0.1,rdStep:5},x.mods);
+ RAIC_FAC.forEach(([id,,d])=>{if(!x.raic.f[id])x.raic.f[id]={on:false,v:d};});
+ return x;
+}
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){S=null}
+S=migrate(S);
+const PJ={db:null,id:null,dirty:false,list:[],stamp:null,pendingOpen:null,delArmed:false,busy:false};
+try{PJ.id=localStorage.getItem(KEY+'.cur')||null;PJ.dirty=localStorage.getItem(KEY+'.dirty')==='1';PJ.stamp=Number(localStorage.getItem(KEY+'.stamp'))||null;}catch(e){}
+function pjPersist(){try{PJ.id?localStorage.setItem(KEY+'.cur',PJ.id):localStorage.removeItem(KEY+'.cur');localStorage.setItem(KEY+'.dirty',PJ.dirty?'1':'0');localStorage.setItem(KEY+'.stamp',String(PJ.stamp||''));}catch(e){}}
+function store(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){store();if(!PJ.dirty){PJ.dirty=true;pjPersist();}if(typeof pjRender==='function')pjRender();}
+
+const $=id=>document.getElementById(id);
+const get=p=>p.split('.').reduce((o,k)=>o==null?o:o[k],S);
+function set(p,v){const ks=p.split('.');let o=S;for(let i=0;i<ks.length-1;i++)o=o[ks[i]];o[ks.at(-1)]=v;}
+const money=v=>'$'+Math.round(v||0).toLocaleString('en-CA');
+function short(v){v=v||0;const a=Math.abs(v);if(a>=1e6)return '$'+(v/1e6).toFixed(a>=1e7?1:2)+'M';if(a>=1e3)return '$'+(a>=1e5?Math.round(v/1e3):(v/1e3).toFixed(1))+'k';return '$'+Math.round(v);}
+const pct=(v,d=1)=>isFinite(v)?(v*100).toFixed(d)+'%':'–';
+const hrs=v=>Math.round(v).toLocaleString('en-CA')+' h';
+const rate=l=>S.rateLo+(S.rateHi-S.rateLo)*l/100;
+const mixLbl=l=>l<34?'Minor':l<67?'Balanced':'High';
+const fteTxt=f=>{const h=f*S.hpw;return f.toFixed(2)+' FTE · '+(h<10?h.toFixed(1):Math.round(h))+' h/wk'};
+const typeOf=()=>TYPES.find(t=>t.id===S.budget.type)||TYPES[0];
+const refTag=k=>`<span class="ref" data-ref="${k}"></span>`;
+
+/* ---------- build ---------- */
+function buildStatic(){
+ $('type-sel').innerHTML=TYPES.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+ const row=(p,sub)=>`
+ <div class="ph" id="ph-${p.id}" style="--c:var(--ph-${p.id})">
+  <label class="ph-name nm"><input type="checkbox" data-k="phases.${p.id}.on"><span>${p.name}${sub?`<small>${sub}</small>`:''}</span></label>
+  <div class="wk"><span class="lbl">Weeks${WREF[p.id]?refTag(WREF[p.id]):''}</span><input type="number" min="0" step="1" data-k="phases.${p.id}.weeks" aria-label="${p.name} weeks"><small id="wks-${p.id}"></small></div>
+  <div class="ld"><span class="lbl">Senior involvement <b id="lv-${p.id}"></b></span><input type="range" min="0" max="100" step="5" data-k="phases.${p.id}.lead" list="leadticks" aria-label="${p.name} senior involvement"><div class="scale"><span>Minor</span><span>Balanced</span><span>High</span></div></div>
+  <div class="ft"><span class="lbl">Staffing <b id="fv-${p.id}"></b></span><input type="range" min="0.05" max="2" step="0.05" data-k="phases.${p.id}.fte" aria-label="${p.name} FTE"><div class="scale"><span>½ day/wk</span><span>1 FTE</span><span>2 FTE</span></div></div>
+  <label class="mt"><input type="checkbox" data-k="phases.${p.id}.mtg">Client meetings (virtual)</label>
+  <div class="out"><span id="ho-${p.id}"></span><strong id="fo-${p.id}"></strong></div>
+ </div>`;
+ $('ph-design').innerHTML=DPH.map(p=>row(p,p.sub)).join('');
+ $('ph-tender').innerHTML=row({id:'tender',name:'Tender'},'Addenda, bid review');
+ $('ph-warr').innerHTML=row({id:'warr',name:'Warranty'},'Often out of scope');
+ $('mods').innerHTML=MODS.map(m=>`
+ <div class="panel mod stack">
+  <div class="lv"><h3 style="color:var(--ink)">${m.name}${m.id==='approvals'?refTag('client'):''}</h3><b id="md-${m.id}"></b></div>
+  <input type="range" min="1" max="5" step="1" data-k="mods.${m.id}" aria-label="${m.name}">
+  <div class="pips" id="mp-${m.id}"></div>
+  <p class="note" id="mdesc-${m.id}">${m.desc}</p>
+  <div class="kv"><span id="mh-${m.id}"></span><strong id="mf-${m.id}"></strong></div>
+ </div>`).join('');
+ $('raic-cat').innerHTML=`<option value="0">Match project type</option>`+Object.entries(RAIC_CAT).map(([k,v])=>`<option value="${k}">${k} · ${v}</option>`).join('');
+ RAIC_FAC.forEach(([id,,d])=>{if(!S.raic.f[id])S.raic.f[id]={on:false,v:d};});
+ $('raic-fac').innerHTML=RAIC_FAC.map(([id,l])=>`<label class="chk"><input type="checkbox" data-k="raic.f.${id}.on">${l}</label><input type="number" step="0.05" data-k="raic.f.${id}.v" aria-label="${l} factor">`).join('');
+ $('stages').innerHTML=[0,1,2].map(i=>`
+ <div class="stage" style="--c:var(--ph-${STAGE_IDS[i]})">
+  <div class="top"><b id="st-name-${i}"></b><span class="sub" id="st-sum-${i}"></span></div>
+  <div><span class="lbl">Weeks${i===0?refTag('construction weeks'):''}</span><input type="number" min="0" step="1" data-k="ca.stages.${i}.weeks" aria-label="Stage weeks"></div>
+  <div><span class="lbl">RFIs, changes, substitutions, general coordination <b id="st-rfi-${i}"></b></span><input type="range" min="0" max="2" step="0.1" data-k="ca.stages.${i}.rfi" aria-label="RFI and coordination days per week"><div class="scale"><span>None</span><span>1 day/wk</span><span>2 days/wk</span></div></div>
+  <div class="kv"><span id="st-h-${i}"></span><strong id="st-f-${i}"></strong></div>
+ </div>`).join('');
+}
+function buildCons(){
+ $('cons-list').innerHTML=S.cons.map((c,i)=>`
+ <div class="cons-row">
+  <input type="text" data-k="cons.${i}.name" aria-label="Consultant name">
+  <input type="number" min="0" step="1000" data-k="cons.${i}.fee" placeholder="Fee" aria-label="Consultant fee">
+  <span class="mono" id="cp-${i}"></span><span class="mono" id="cr-${i}"></span>
+  <button type="button" data-del="${i}" aria-label="Remove consultant">×</button>
+ </div>`).join('');
+}
+function renderType(){
+ const t=typeOf(),r=$('rate-rng');
+ r.min=t.lo;r.max=t.hi;r.step=t.step;
+ if(S.budget.rate<t.lo||S.budget.rate>t.hi)S.budget.rate=t.def;
+ r.value=S.budget.rate;
+ $('qty-lbl').textContent=t.qtyLbl;$('rate-lbl').textContent='$ / '+t.unit;
+ $('rate-lo').textContent=short(t.lo);$('rate-hi').textContent=short(t.hi);
+ $('gfa-box').hidden=t.unit==='sf';
+ const sub=ALTUS_SUB[t.id];
+ $('altus-box').hidden=!sub;
+ $('altus-sub-box').hidden=!sub;
+ if(sub&&$('altus-sub-sel').dataset.built!==t.id){
+  const hasGroups=sub[0].length>4;
+  if(hasGroups){
+   const groups=[...new Set(sub.map(r=>r[4]))];
+   $('altus-sub-sel').innerHTML=groups.map(g=>`<optgroup label="${g}">${sub.filter(r=>r[4]===g).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</optgroup>`).join('');
+  }else{
+   $('altus-sub-sel').innerHTML=sub.map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+  }
+  $('altus-sub-sel').dataset.built=t.id;
+  if(!sub.some(r=>r[0]===S.budget.altusSub))S.budget.altusSub=sub[0][0];
+  $('altus-sub-sel').value=S.budget.altusSub;
+ }
+}
+function fill(){
+ document.querySelectorAll('[data-k]').forEach(el=>{
+  const v=get(el.dataset.k);
+  if(el.type==='checkbox')el.checked=!!v;else el.value=((el.dataset.k==='budget.gfa'||el.dataset.k==='budget.qty'||el.dataset.k==='budget.storeys'||el.dataset.k==='gut.designMonths'||el.dataset.k==='gut.conMonths'||el.dataset.k==='budget.override'||el.dataset.k==='travel.km'||el.dataset.k==='travel.hrs'||/^cons\.\d+\.fee$/.test(el.dataset.k))&&!v)?'':(v??'');
+ });
+ renderType();
+}
+function steppers(root){
+ (root||document).querySelectorAll('input[type=number][data-k]').forEach(el=>{
+  if(el.closest('.stp,.settings,.fac,.cons-row')||/budget\.(override|gfa|storeys)|spec\.amt/.test(el.dataset.k))return;
+  el.setAttribute('inputmode','decimal');
+  const w=document.createElement('span');w.className='stp';el.parentNode.insertBefore(w,el);
+  const mk=(t,d)=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.setAttribute('aria-label',(d>0?'Increase ':'Decrease ')+(el.getAttribute('aria-label')||'value'));
+   b.addEventListener('click',()=>{const st=parseFloat(el.step)||1,mn=el.min!==''?parseFloat(el.min):-Infinity,mx=el.max!==''?parseFloat(el.max):Infinity;
+    let v=(parseFloat(el.value)||0)+d*st;v=Math.min(mx,Math.max(mn,Math.round(v/st)*st));v=Math.round(v*1000)/1000;el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}));});return b;};
+  w.appendChild(mk('−',-1));w.appendChild(el);w.appendChild(mk('+',1));
+ });
+}
+function buildAll(){buildStatic();buildCons();fill();compute();steppers();}
+
+/* ---------- input ---------- */
+document.addEventListener('input',e=>{
+ const el=e.target,k=el.dataset.k;if(!k)return;
+ if(k==='name')$('nm-in').classList.remove('need');
+ if(el.closest('#sec-phases,#sec-strategy'))S.expSet=true;
+ let v;
+ if(el.type==='checkbox')v=el.checked;
+ else if(el.type==='number'||el.type==='range')v=parseFloat(el.value),v=isNaN(v)?0:v;
+ else if(el.tagName==='SELECT'&&/every$|raic\.cat$/.test(k))v=Number(el.value);
+ else v=el.value;
+ set(k,v);
+ if(k==='budget.type'){const t=typeOf();S.budget.rate=t.def;renderType();}
+ document.querySelectorAll(`[data-k="${k}"]`).forEach(o=>{if(o!==el&&o.type!=='checkbox')o.value=v;});
+ save();compute();
+});
+document.addEventListener('change',e=>{if(e.target.tagName==='SELECT'&&e.target.dataset.k)e.target.dispatchEvent(new Event('input',{bubbles:true}));});
+$('cons-add').onclick=()=>{S.cons.push({name:'Consultant',fee:0});buildCons();fill();save();compute();};
+$('cons-list').addEventListener('click',e=>{const i=e.target.dataset.del;if(i==null)return;S.cons.splice(+i,1);buildCons();fill();save();compute();});
+let resetArmed=false;
+$('reset').onclick=()=>{
+ if(!resetArmed){resetArmed=true;$('reset').textContent='Click again to clear';setTimeout(()=>{resetArmed=false;$('reset').textContent='Clear project'},3000);return;}
+ resetArmed=false;$('reset').textContent='Clear project';S=example();PJ.id=null;PJ.stamp=null;PJ.dirty=false;pjPersist();store();buildCons();fill();compute();pjRender();toast('Cleared');
+};
+function toast(t,id='toast'){const el=$(id);el.textContent=t;clearTimeout(el._t);el._t=setTimeout(()=>el.textContent='',2600);}
+function copyText(txt,id){
+ const fb=()=>{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Copied',id)}catch(e){toast('Select and copy manually',id)}ta.remove();};
+ try{navigator.clipboard.writeText(txt).then(()=>toast('Copied',id),fb)}catch(e){fb()}
+}
+
+/* ---------- calculations ---------- */
+let R={};
+function calc(){
+ const hpm=S.hpw*52/12,day=S.hpw/5;
+ S.travel.km=kmFor(S.travel.hrs);
+ const t=typeOf(),B=S.budget;
+ const est=B.qty*B.rate,over=B.override>0,budget=over?B.override:est;
+ const lo=B.qty*t.lo,hi=B.qty*t.hi;
+ const area=t.unit==='sf'?B.qty:B.gfa;
+ // meetings
+ const modHw=id=>(Math.max(1,S.mods[id])-1)/4*S.mods.max;
+ const modPW=modHw('client')+modHw('coord');
+ const rdPct=(Math.max(1,S.mods.rev)-1)*S.mods.rdStep/100;
+ const md=S.meet.design,mc=S.meet.con;
+ const mEach=M=>M.people*M.remHrs;
+ const mKm=()=>0;
+ // FTE phases
+ const fteRow=(id,name,group)=>{
+  const s=S.phases[id],r=rate(s.lead),M=group==='design'?md:mc;
+  const o={id,name,group,on:s.on,weeks:s.on?s.weeks:0,fte:s.fte,rate:r,base:0,mtgN:0,mtgH:0,modH:0,modFee:0,revW:0,revH:0,revFee:0,rdH:0,rdFee:0,hours:0,fee:0,km:0};
+  if(!s.on)return o;
+  o.base=s.weeks*s.fte*S.hpw;
+  if(S.mods.approvals>1&&['sd','dd','cd'].includes(id)){o.revW=(Math.max(1,S.mods.approvals)-1)*S.mods.revStep;o.revH=o.revW*S.mods.hold*S.hpw;}
+  const W=s.weeks+o.revW;
+  if(s.mtg&&M.every>0){o.mtgN=Math.floor(W/M.every);o.mtgH=o.mtgN*mEach(M);o.km=o.mtgN*mKm(M);}
+  o.modH=W*modPW;if(['sd','dd','cd'].includes(id)){o.rdH=o.base*rdPct;o.rdFee=o.rdH*r;}
+  o.hours=o.base+o.mtgH+o.modH+o.revH+o.rdH;o.fee=o.hours*r;o.modFee=o.modH*r;o.revFee=o.revH*r;o.disb=o.km*S.mileage;return o;
+ };
+ const design=DPH.map(p=>fteRow(p.id,p.name,'design'));
+ const tender=fteRow('tender','Tender','con'),warr=fteRow('warr','Warranty','con');
+ const specFee=S.spec.three?S.spec.amt:0;
+ // CA
+ const caRate=rate(S.ca.lead);
+ const caOn=S.ca.on,caW=caOn?S.ca.stages.reduce((a,z)=>a+(z.weeks||0),0):0;
+ const T={sdN:caOn?S.ca.sdTotal:0};T.sdH=T.sdN*S.ca.sdDays*day;
+ T.mtgN=caOn&&S.ca.mtg&&mc.every>0?Math.floor(caW/mc.every):0;T.mtgH=T.mtgN*mEach(mc);T.mtgKm=T.mtgN*mKm(mc);
+ T.svN=caOn?(S.ca.siteMethod==='count'?S.ca.svTotal:(S.ca.svEvery>0?Math.floor(caW/S.ca.svEvery):0)):0;
+ T.svH=T.svN*S.ca.sitePeople*(S.ca.siteHrs+S.travel.hrs);T.svKm=T.svN*S.travel.km;
+ const stages=S.ca.stages.map((st,i)=>{
+  const o={id:STAGE_IDS[i],name:st.name,group:'con',weeks:caOn?st.weeks:0,rate:caRate,sdN:0,sdH:0,rfiH:0,mtgN:0,mtgH:0,svN:0,svH:0,modH:0,modFee:0,km:0,mtgKm:0,svKm:0,hours:0,fee:0,disb:0,ownH:0,ownFee:0};
+  if(!caOn)return o;
+  const sh=caW?st.weeks/caW:0;
+  o.rfiH=st.rfi*day*st.weeks;o.modH=st.weeks*modPW;o.modFee=o.modH*caRate;
+  o.ownH=o.rfiH+o.modH;o.ownFee=o.ownH*caRate;
+  o.sdN=T.sdN*sh;o.sdH=T.sdH*sh;o.mtgN=T.mtgN*sh;o.mtgH=T.mtgH*sh;o.mtgKm=T.mtgKm*sh;o.svN=T.svN*sh;o.svH=T.svH*sh;o.svKm=T.svKm*sh;o.km=o.mtgKm+o.svKm;
+  o.hours=o.ownH+o.sdH+o.mtgH+o.svH;o.fee=o.hours*caRate;o.disb=o.km*S.mileage;
+  o.fte=st.weeks?o.hours/(st.weeks*S.hpw):0;
+  return o;
+ });
+ const sum=(a,f)=>a.reduce((x,y)=>x+(f(y)||0),0);
+ const ca={hours:sum(stages,s=>s.hours),fee:sum(stages,s=>s.fee),weeks:sum(stages,s=>s.weeks),disb:sum(stages,s=>s.disb),
+  sdN:T.sdN,svN:T.svN,mtgN:T.mtgN,
+  sdH:sum(stages,s=>s.sdH),mtgKm:sum(stages,s=>s.mtgKm),svKm:sum(stages,s=>s.svKm),modH:sum(stages,s=>s.modH),rfiH:sum(stages,s=>s.rfiH),mtgH:sum(stages,s=>s.mtgH),svH:sum(stages,s=>s.svH)};
+ ca.monthly=ca.weeks?ca.fee/(ca.weeks*12/52):0;
+ const conRows=[tender,...stages,warr];
+ const exp={d:sum(design,p=>p.fee)+specFee,c:sum(conRows,p=>p.fee),dH:sum(design,p=>p.hours),cH:sum(conRows,p=>p.hours),
+  disb:sum(design,p=>p.disb)+sum(conRows,p=>p.disb),dW:sum(design,p=>p.weeks+p.revW),revW:sum(design,p=>p.revW),revH:sum(design,p=>p.revH),revFee:sum(design,p=>p.revFee),cW:sum(conRows,p=>p.weeks)};
+ exp.t=exp.d+exp.c;
+ const all=[...design,...conRows];
+ const mod={pw:modPW,rdPct,rdH:sum(design,p=>p.rdH),rdFee:sum(design,p=>p.rdFee),wkH:sum(all,p=>p.modH),wkFee:sum(all,p=>p.modFee),revW:sum(design,p=>p.revW),revH:sum(design,p=>p.revH),revFee:sum(design,p=>p.revFee)};
+ mod.hours=mod.wkH+mod.rdH+mod.revH;mod.fee=mod.wkFee+mod.rdFee+mod.revFee;
+ mod.each=MODS.map(m=>{if(m.id==='rev')return{id:m.id,pw:0,hours:mod.rdH,fee:mod.rdFee};if(m.id==='approvals')return{id:m.id,pw:0,hours:mod.revH,fee:mod.revFee};
+  const f=modPW?modHw(m.id)/modPW:0;return{id:m.id,pw:modHw(m.id),hours:mod.wkH*f,fee:mod.wkFee*f};});
+ // gut
+ const gr=rate(S.gut.lead);
+ const gut={dH:S.gut.designMonths*hpm,cH:S.gut.conMonths*hpm*S.gut.conFte,rate:gr};
+ gut.modD=S.gut.designMonths*52/12*modPW;gut.modC=S.gut.conMonths*52/12*modPW;
+ gut.modD+=S.gut.designMonths*hpm*rdPct*0.85;
+ gut.dH+=gut.modD;gut.cH+=gut.modC;
+ gut.d=gut.dH*gr+specFee;gut.c=gut.cH*gr;gut.t=gut.d+gut.c;gut.monthly=S.gut.conMonths?gut.c/S.gut.conMonths:0;
+ return {mod,hpm,day,t,est,over,budget,lo,hi,area,design,tender,warr,stages,ca,specFee,exp,gut,conRows};
+}
+
+/* ---------- render ---------- */
+function compute(){
+ R=calc();const {budget,gut,exp,ca,t}=R;
+ const B=S.budget;
+ // title block
+ $('tb-sub').textContent=[new Date().toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'})].filter(Boolean).join(' · ');
+ $('tb-budget').textContent=short(budget);
+ $('tb-range').textContent=R.over?'Client / RFP figure':`${t.name.replace('Multi-res, ','')}`;
+ const hasGut=gut.t>R.specFee+0.5;
+ $('tb-gut').textContent=hasGut?short(gut.t):'—';$('tb-gutpct').textContent=hasGut?pct(gut.t/budget,2)+' of const.':'Fill in top-down estimate';
+ $('tb-exp').textContent=short(exp.t);$('tb-exppct').textContent=pct(exp.t/budget,2)+' of const.';
+ const inBand=ca.monthly>=S.caLo&&ca.monthly<=S.caHi;
+ $('tb-ca').textContent=short(ca.monthly);$('tb-ca').className='fig '+(inBand?'':'delta-pos');
+ $('tb-caband').textContent=`target ${short(S.caLo)}–${short(S.caHi)}`;
+ const dv=gut.t?(exp.t-gut.t)/gut.t:NaN;
+ $('tb-var').textContent=hasGut?(dv>=0?'+':'')+pct(dv):'—';$('tb-var').className='fig '+(hasGut&&Math.abs(dv)>0.15?'delta-pos':'');
+ $('tb-split').textContent=`split ${pct(exp.d/exp.t,0)} / ${pct(exp.c/exp.t,0)}`;
+ $('mb-bud').textContent=short(budget);$('mb-exp').textContent=`${short(exp.t)} · ${pct(exp.t/budget,1)}`;$('mb-ca').textContent=short(ca.monthly)+(inBand?'':' ⚑');
+
+ // setup: budget
+ $('rate-val').textContent=money(B.rate);
+ $('bud-calc').textContent=`Estimate ${money(R.est)}  (${short(R.lo)}–${short(R.hi)})`;
+ $('bud-use').textContent=money(budget);
+ const flags=[];let ok=[];
+ if(R.over&&B.qty>0){
+  const per=B.override/B.qty;
+  if(per<t.lo||per>t.hi)flags.push(`The client budget works out to ${money(per)} per ${t.unit}, ${per<t.lo?'below':'above'} the typical ${short(t.lo)}–${short(t.hi)} range for ${t.name.toLowerCase()}. Check the scope against the budget before pricing.`);
+  else ok.push(`Client budget works out to ${money(per)} per ${t.unit}, inside the typical range.`);
+ }
+ if(t.unit!=='sf'&&R.area>0){
+  const psf=budget/R.area;
+  if(psf<SF_RANGE[0]||psf>SF_RANGE[1])flags.push(`That is ${money(psf)}/sf over ${R.area.toLocaleString('en-CA')} sf, outside the ${money(SF_RANGE[0])}–${money(SF_RANGE[1])}/sf general construction range.`);
+  else ok.push(`${money(psf)}/sf over ${R.area.toLocaleString('en-CA')} sf.`);
+ }
+ const bf=$('bud-flag');
+ if(flags.length){bf.hidden=false;bf.className='flag';bf.textContent=flags.join(' ');}
+ else if(ok.length){bf.hidden=false;bf.className='flag ok';bf.textContent=ok.join(' ');}
+ else bf.hidden=true;
+ drawAltus(budget,R.area);
+ $('sf-setup').textContent=`${short(budget)} · ${exp.dW+exp.cW} wks`;
+ $('wk-d').textContent=(exp.revW?`${exp.dW-exp.revW} + ${exp.revW} review wks`:exp.dW+' wks')+` (${(exp.dW*12/52).toFixed(1)} mo) · ${hrs(exp.dH)} · ${money(exp.d)}`;
+ $('wk-c').textContent=`${exp.cW} wks (${(exp.cW*12/52).toFixed(1)} mo) · ${hrs(exp.cH)} · ${money(exp.c)}`;
+
+ // modifiers
+ const M=R.mod;
+ $('mod-max-txt').textContent=S.mods.max;$('rd-step-txt').textContent=S.mods.rdStep;
+ MODS.forEach((m,i)=>{const lv=S.mods[m.id],e=M.each[i];
+  $('md-'+m.id).textContent=lv+' · '+LVL[lv];
+  $('mp-'+m.id).innerHTML=[1,2,3,4,5].map(n=>`<i class="${n<=lv&&lv>1?'on':''}"></i>`).join('');
+  $('mh-'+m.id).textContent=m.id==='rev'?`+${pct(M.rdPct,0)} of SD–CD · ${hrs(e.hours)}`:m.id==='approvals'?(S.mods.approvals>1?`+${M.revW} review wks · ${hrs(e.hours)}`:'No review periods at level 1'):`+${e.pw.toFixed(2)} h/wk · ${hrs(e.hours)}`;$('mf-'+m.id).textContent=money(e.fee);});
+ $('mod-sum').textContent=`Weekly +${M.pw.toFixed(2)} h/wk over ${exp.dW+exp.cW} wks (${hrs(M.wkH)}) · review holding ${hrs(M.revH)} · redesign ${hrs(M.rdH)} · total ${hrs(M.hours)} · top-down estimate +${hrs(gut.modD+gut.modC)}`;
+ $('mod-fee').textContent=money(M.fee);
+ $('mdesc-approvals').textContent=APPROVAL_LVL[S.mods.approvals]+' Reviews add schedule risk.';
+ $('rev-sum').textContent=exp.revW?`Approval reviews: +${exp.revW} wks across ${R.design.filter(p=>p.revW).length} design gates · ${hrs(exp.revH)} holding effort (meetings and strategy hours in those weeks are counted above)`:'Approval reviews: none at level 1';
+ $('rev-fee').textContent=money(exp.revFee);
+ $('sf-mod').textContent=M.fee?`+${short(M.fee)} · ${pct(M.fee/exp.t,0)} of fee`:'none';
+ // gut
+ $('g-rate').textContent=`${mixLbl(S.gut.lead)} · $${Math.round(gut.rate)}/h`;
+ const hasG=gut.t>R.specFee+0.5;
+ $('g-tot').textContent=hasG?money(gut.t):'';
+ {const gv=exp.t?(gut.t-exp.t)/exp.t:0;$('g-sub').textContent=!hasG?'Fill in the months above to see the top-down fee.':`${pct(gut.t/budget,2)} of const. · ${short(gut.monthly)}/mo CA · ${Math.abs(gv)<0.005?'matches':pct(Math.abs(gv),0)+(gv>0?' above':' below')} expanded`;}
+
+ // FTE rows
+ [...R.design,R.tender,R.warr].forEach(p=>{
+  const s=S.phases[p.id];
+  $('ph-'+p.id).classList.toggle('off',!s.on);
+  $('wks-'+p.id).textContent=p.revW?`+ ${p.revW} review`:'';
+  $('lv-'+p.id).textContent=`${mixLbl(s.lead)} · $${Math.round(p.rate)}/h`;
+  $('fv-'+p.id).textContent=s.on?`${s.fte.toFixed(2)} FTE → ${hrs(p.base)} over ${s.weeks} wks`:fteTxt(s.fte);
+  {const x=[];if(p.revH)x.push(`+${Math.round(p.revH)} h review`);if(p.mtgH){const M=p.group==='design'?S.meet.design:S.meet.con,each=M.remHrs;x.push(`${p.mtgN} mtg${p.mtgN>1?'s':''} × ${each} h × ${M.people} staff = ${Math.round(p.mtgH*10)/10} h`);}if(p.modH)x.push(`+${Math.round(p.modH)} h strategy`);if(p.rdH)x.push(`+${Math.round(p.rdH)} h redesign`);$('ho-'+p.id).textContent=s.on?`${hrs(p.hours)}${x.length?' ('+x.join(', ')+')':''}`:'Not in scope';}
+  $('fo-'+p.id).textContent=s.on?money(p.fee):'–';
+ });
+ $('spec-lbl').textContent=S.spec.three?'External spec writer':'Internal specs';$('spec-fee').textContent=S.spec.three?money(S.spec.amt):'$0';
+
+
+ // CA
+ $('ca').style.opacity=S.ca.on?1:.5;
+ $('ca-rate').textContent=`${mixLbl(S.ca.lead)} · $${Math.round(rate(S.ca.lead))}/h`;
+ $('ca-hrs').textContent=S.ca.on?`${hrs(ca.hours)} · ${ca.weeks} wks`:'Not in scope';$('ca-fee').textContent=S.ca.on?money(ca.fee):'–';
+ $('ca-sd-v').textContent=`${S.ca.sdTotal} · ${Math.round(ca.sdH)} h`;
+ $('ca-sv-v').textContent=`${S.ca.svTotal} × ${S.ca.siteHrs} h on site`;
+ {const cr=rate(S.ca.lead),tt=S.travel.hrs*S.ca.sitePeople*cr,mi=S.travel.km*S.mileage;$('ca-tr-v').textContent=`${S.travel.hrs} h ≈ ${Math.round(S.travel.km)} km · ${money(tt)} driving time + ${money(mi)} mileage = ${money(tt+mi)}/trip`;}
+ {const cr=rate(S.ca.lead),cm=S.meet.con;
+  const cadTxt=cm.every==0?'no meetings set':`${({1:'weekly',2:'every other week',4:'monthly'})[cm.every]}, virtual, ${cm.people} attending`;
+  const svTxt=`<b>${ca.svN} visits</b> · ${S.ca.siteHrs} h on site + ${S.travel.hrs} h driving (≈${Math.round(S.travel.km)} km) · ${money((S.ca.siteHrs+S.travel.hrs)*S.ca.sitePeople*cr+S.travel.km*S.mileage)} per visit incl. mileage`;
+  const mil=km=>km?` + ${money(km*S.mileage)} mileage`:'';
+  const tr=(c,l,n,d,h,x)=>`<tr><td><i style="background:${c}"></i>${l}</td><td class="mono">${n}</td><td style="text-align:left;color:var(--ink-2);white-space:normal">${d}</td><td>${Math.round(h)} h</td><td>${money(h*cr)}${x||''}</td></tr>`;
+  $('ca-tot').innerHTML=S.ca.on?
+   tr('var(--ph-ca2)','Shop drawings',ca.sdN,`${S.ca.sdDays} day each`,ca.sdH)+
+   tr('var(--ca-mtg)','Client meetings',ca.mtgN,S.ca.mtg?`<b>${cadTxt}</b> · set in <a href="#" class="go-setup" data-f="mtg">07 Rates and assumptions</a>`:'not included',ca.mtgH,mil(ca.mtgKm))+
+   tr('var(--ca-sv)','Site visits',ca.svN,svTxt,ca.svH,mil(ca.svKm))+
+   tr('var(--ph-ca1)','RFIs, changes, coordination','','by stage, below',ca.rfiH)+
+   (ca.modH?tr('color-mix(in srgb,var(--red) 45%,var(--sheet))','Strategy allowance','','from section 03',ca.modH):'')+
+   `<tr class="tot"><td>CA total</td><td></td><td></td><td>${hrs(ca.hours)}</td><td>${money(ca.fee)}${ca.disb?` + ${money(ca.disb)}`:''}</td></tr>`:'';}
+ R.stages.forEach((st,i)=>{
+  const s=S.ca.stages[i];
+  $('st-name-'+i).textContent=s.name;
+  $('st-sum-'+i).textContent=`${st.fte?st.fte.toFixed(2):'0.00'} FTE avg`;
+  $('st-rfi-'+i).textContent=`${s.rfi.toFixed(1)} day/wk → ${hrs(st.rfiH)} over ${s.weeks} wks`;
+  $('st-h-'+i).textContent=`RFIs & coordination ${Math.round(st.rfiH)} h${st.modH?` + ${Math.round(st.modH)} h strategy`:''}`;
+  $('st-f-'+i).textContent=money(st.ownFee);
+ });
+ const parts=[['Shop drawings',ca.sdH,'var(--ph-ca2)'],['RFIs / changes / subs',ca.rfiH,'var(--ph-ca1)'],['Client meetings',ca.mtgH,'var(--ca-mtg)'],['Site visits',ca.svH,'var(--ca-sv)'],['Strategy',ca.modH,'color-mix(in srgb,var(--red) 45%,var(--sheet))']];
+ $('ca-mix').innerHTML=parts.filter(p=>p[1]>0).map((p,i)=>`<div style="width:${p[1]/ca.hours*100}%;background:${p[2]};color:${i<1?'var(--sheet)':'var(--ink)'}">${p[1]/ca.hours>0.1?pct(p[1]/ca.hours,0):''}</div>`).join('');
+ $('ca-mix-leg').innerHTML=parts.map(p=>`<span><i style="background:${p[2]}"></i>${p[0]} ${hrs(p[1])}</span>`).join('')+`<span>${ca.sdN} shop drawings${ca.sdN<10||ca.sdN>40?' (typical 10–40)':''}</span>`;
+ drawGauge();
+ $('sf-phases').textContent=`${exp.dW+exp.cW} wks · ${short(exp.t)} · CA ${short(ca.monthly)}/mo`;
+
+ document.querySelectorAll('[data-ref]').forEach(el=>{const r=S.refs&&S.refs[el.dataset.ref];el.textContent=r||'';el.hidden=!r;if(r)el.title='RFP reference: '+r;});
+ drawHist();drawCompare();drawCons();drawRaic();if(typeof drawSvSetup==='function')drawSvSetup();
+ $('sf-set').textContent=`$${S.rateLo}–$${S.rateHi}/h`;
+ const empty=!(R.budget>0);document.body.classList.toggle('empty',empty);$('start-hint').hidden=!empty;
+ const noExp=!S.expSet;document.body.classList.toggle('noexp',noExp);$('exp-go').hidden=!noExp;
+ if(noExp&&!empty){[['tb-exp','—'],['tb-exppct','Work through 02 Phases'],['tb-ca','—'],['tb-caband',''],['tb-var','—'],['tb-split','']].forEach(([id,t])=>{$(id).textContent=t;});$('tb-ca').className='fig';$('tb-var').className='fig';
+  $('mb-exp').textContent='—';$('mb-ca').textContent='—';
+  if(gut.t>R.specFee+0.5)$('g-sub').textContent=`${pct(gut.t/budget,2)} of const. · ${short(gut.monthly)}/mo CA`;
+  ['sf-phases','sf-mod','sf-cmp','sf-cons','sf-raic'].forEach(id=>{$(id).textContent='';});}
+ if(empty){[['tb-budget','—'],['tb-range','Add project size'],['tb-gut','—'],['tb-gutpct',''],['tb-exp','—'],['tb-exppct',''],['tb-ca','—'],['tb-caband',''],['tb-var','—'],['tb-split','']].forEach(([id,t])=>{$(id).textContent=t;});$('tb-ca').className='fig';$('tb-var').className='fig';$('sf-setup').textContent='Start here';}
+}
+
+function drawAltus(budget,area){
+ const pick=altusPick();
+ const box=$('altus-box'),af=$('altus-flag'),note=$('altus-note');
+ if(!pick){$('altus-calc').textContent='';$('altus-range').textContent='';af.hidden=true;note.textContent='';return;}
+ box.style.opacity=1;
+ const EXCL='Above-grade building cost only — does not include below-grade construction, parking, or site works/excavation.';
+ if(!(area>0)){
+  $('altus-calc').textContent=`${pick.label}: $${pick.lo}–$${pick.hi}/sf (Altus 2026 Canadian Cost Guide, Halifax)`;
+  $('altus-range').textContent='–';af.hidden=true;
+  note.textContent=`Enter gross floor area above to turn this into a budget range. ${EXCL}`;
+  return;
+ }
+ const lo=area*pick.lo,hi=area*pick.hi;
+ $('altus-calc').textContent=`${pick.label}: $${pick.lo}–$${pick.hi}/sf × ${Math.round(area).toLocaleString('en-CA')} sf`;
+ $('altus-range').textContent=`${short(lo)}–${short(hi)}`;
+ note.textContent=EXCL;
+ if(budget>0){
+  af.hidden=false;
+  if(budget<lo||budget>hi){af.className='flag';af.textContent=`The working budget of ${money(budget)} is ${budget<lo?'below':'above'} the Altus Halifax range of ${short(lo)}–${short(hi)} for this building type (above-grade only).`;}
+  else{af.className='flag ok';af.textContent=`The working budget of ${money(budget)} sits inside the Altus Halifax range (above-grade only).`;}
+ }else af.hidden=true;
+}
+function drawGauge(){
+ const {ca,gut}=R;const v=ca.monthly,g=gut.monthly;
+ const max=Math.max(S.caHi*1.5,v*1.1,g*1.1,1);const X=x=>Math.min(100,x/max*100);
+ const step=max>40000?10000:max>15000?5000:2500;
+ let ticks='';for(let x=0;x<=max;x+=step)ticks+=`<span class="tick" style="left:${X(x)}%">${short(x)}</span>`;
+ $('gauge').innerHTML=`<div class="band" style="left:${X(S.caLo)}%;width:${X(S.caHi)-X(S.caLo)}%"></div>`+
+  (g?`<div class="mk g" style="left:${X(g)}%" title="Top-down estimate"></div>`:'')+
+  `<div class="mk" style="left:${X(v)}%"><span>${short(v)}/mo</span></div>`+ticks;
+ const inB=v>=S.caLo&&v<=S.caHi;
+ $('ca-verdict').innerHTML=!S.ca.on?'CA is not in scope.':
+  `Expanded CA averages <b>${money(v)}</b> a month over ${(ca.weeks*12/52).toFixed(1)} months${g>0?`; the top-down estimate (grey mark) is ${money(g)}`:''}. `+
+  (inB?`That sits inside the ${short(S.caLo)}–${short(S.caHi)} target.`:v>S.caHi?`That is above the ${short(S.caHi)} ceiling. Look at RFI allowance or site visit counts in the intensive stage.`:`That is under ${short(S.caLo)}. CA may be under-resourced for the schedule.`);
+}
+
+/* ---------- staffing histogram ---------- */
+function drawHist(){
+ const rows=[...R.design.filter(p=>p.on),R.tender.on?R.tender:null,...(S.ca.on?R.stages:[]),R.warr.on?R.warr:null].filter(p=>p&&p.weeks>0);
+ const W=rows.reduce((a,p)=>a+p.weeks+(p.revW||0),0);
+ const svg=$('hist');const L=44,Rt=808,T=26,B=190;
+ const maxF=Math.max(2,...rows.map(p=>p.fte||0));
+ const x=w=>L+(Rt-L)*w/(W||1),y=f=>B-(B-T)*f/maxF;
+ let g='';
+ for(let f=0;f<=maxF+1e-9;f+=0.5)g+=`<line x1="${L}" x2="${Rt}" y1="${y(f)}" y2="${y(f)}" style="stroke:var(--rule-2)" stroke-width="1"/><text x="${L-8}" y="${y(f)+4}" text-anchor="end" style="fill:var(--ink-3);font:11px var(--f-mono)">${f.toFixed(1)}</text>`;
+ let acc=0;
+ rows.forEach(p=>{
+  const f=p.fte||0,x0=x(acc),w=Math.max(0,x(acc+p.weeks)-x0-1.5);
+  g+=`<rect x="${x0}" y="${y(f)}" width="${w}" height="${B-y(f)}" style="fill:var(--ph-${p.id})"><title>${p.name}: ${p.weeks} wks at ${f.toFixed(2)} FTE</title></rect>`;
+  if(w>26)g+=`<text x="${x0+w/2}" y="${y(f)-6}" text-anchor="middle" style="fill:var(--ink-2);font:600 12px var(--f-disp);letter-spacing:.06em">${ABBR[p.id]}</text>`;
+  acc+=p.weeks;
+  if(p.revW){const r0=x(acc),rw=Math.max(0,x(acc+p.revW)-r0-1.5),hf=S.mods.hold;
+   g+=`<rect x="${r0}" y="${y(hf)}" width="${rw}" height="${B-y(hf)}" style="fill:var(--ph-${p.id});opacity:.45"><title>Client review after ${p.name}: ${p.revW} wks at ${hf} FTE</title></rect>`;
+   if(rw>22)g+=`<text x="${r0+rw/2}" y="${y(hf)-6}" text-anchor="middle" style="fill:var(--ink-3);font:600 11px var(--f-disp);letter-spacing:.06em">REV</text>`;
+   acc+=p.revW;}
+ });
+ const st=[4,8,13,26,52].find(s=>W/s<=10)||104;
+ for(let w=0;w<=W;w+=st)g+=`<line x1="${x(w)}" x2="${x(w)}" y1="${B}" y2="${B+5}" style="stroke:var(--ink-3)"/><text x="${x(w)}" y="${B+19}" text-anchor="middle" style="fill:var(--ink-3);font:11px var(--f-mono)">${w}</text>`;
+ g+=`<line x1="${L}" x2="${Rt}" y1="${B}" y2="${B}" style="stroke:var(--ink)" stroke-width="1"/><text x="${Rt}" y="${B+36}" text-anchor="end" style="fill:var(--ink-3);font:11px var(--f-disp);letter-spacing:.08em">WEEKS</text><text x="${L-8}" y="${T-12}" text-anchor="end" style="fill:var(--ink-3);font:11px var(--f-disp);letter-spacing:.08em">FTE</text>`;
+ svg.innerHTML=g;
+ $('hist-sum').textContent=`${W} weeks (${(W*12/52).toFixed(1)} months) · CA bars show average FTE per stage`;
+}
+
+/* ---------- comparison ---------- */
+function drawCompare(){
+ const {gut,exp,budget,ca}=R;const mx=Math.max(gut.t,exp.t)||1;
+ const bar=(lbl,d,c)=>`<div class="bar-row"><div class="bl"><span>${lbl}</span><b>${money(d+c)} · ${pct((d+c)/budget,2)}</b></div>
+  <div class="track"><div style="width:${d/mx*100}%;background:var(--design)">${d/mx>0.12?pct(d/(d+c),0):''}</div><div style="width:${c/mx*100}%;background:var(--con)">${c/mx>0.12?pct(c/(d+c),0):''}</div></div></div>`;
+ $('cmp-bars').innerHTML=bar('Top-down estimate',gut.d,gut.c)+bar('Expanded',exp.d,exp.c);
+ const segs=[...R.design.map(p=>({id:p.id,n:p.name,v:p.fee})),{id:'spec',n:'Spec writer',v:R.specFee},{id:'tender',n:'Tender',v:R.tender.fee},
+  ...R.stages.map(s=>({id:s.id,n:s.name,v:s.fee})),{id:'warr',n:'Warranty',v:R.warr.fee}].filter(s=>s.v>0);
+ const light=['pre','sd','tender','warr','ca3','ca1'];
+ $('dist').innerHTML=segs.map(s=>`<div style="width:${s.v/exp.t*100}%;background:var(--ph-${s.id});color:${light.includes(s.id)?'var(--ink)':'var(--sheet)'}" title="${s.n}">${s.v/exp.t>0.07?pct(s.v/exp.t,0):''}</div>`).join('');
+ $('dist-leg').innerHTML=segs.map(s=>`<span><i style="background:var(--ph-${s.id})"></i>${s.n} ${pct(s.v/exp.t,1)}</span>`).join('');
+ const dcell=(a,b)=>{if(!a)return '<td>–</td>';const d=(b-a)/a;return `<td class="${d>0.001?'delta-pos':d<-0.001?'delta-neg':''}">${d>=0?'+':''}${pct(d)}</td>`;};
+ const row=(l,a,b,fmt=money,delta=true)=>`<tr><td>${l}</td><td>${fmt(a)}</td><td>${fmt(b)}</td>${delta?dcell(a,b):'<td></td>'}</tr>`;
+ const pp=v=>pct(v,2),p0=v=>pct(v,0);
+ $('cmp-table').innerHTML=
+  row('Design phases fee',gut.d,exp.d)+row('Construction phases fee',gut.c,exp.c)+
+  `<tr class="tot"><td>Total fee</td><td>${money(gut.t)}</td><td>${money(exp.t)}</td>${dcell(gut.t,exp.t)}</tr>`+
+  row('Hours',gut.dH+gut.cH,exp.dH+exp.cH,hrs)+
+  row('Redesign / scope creep allowance',0,R.mod.rdFee,money,false)+
+  row('Strategy allowance (all modifiers)',(gut.modD+gut.modC)*gut.rate,R.mod.fee)+
+  row('CA monthly average',gut.monthly,ca.monthly)+
+  row('Design / construction split',gut.d/gut.t,exp.d/exp.t,v=>`${p0(v)} / ${p0(1-v)}`,false)+
+  row('Design fee, % of construction',gut.d/budget,exp.d/budget,pp,false)+
+  row('Construction fee, % of construction',gut.c/budget,exp.c/budget,pp,false)+
+  `<tr class="tot"><td>Total, % of construction</td><td>${pp(gut.t/budget)}</td><td>${pp(exp.t/budget)}</td><td></td></tr>`+
+  `<tr><td>Disbursements (mileage)</td><td>–</td><td>${money(exp.disb)}</td><td></td></tr>`;
+ const d=(exp.t-gut.t)/gut.t;
+ $('cmp-note').textContent=!isFinite(d)?'':Math.abs(d)<=0.1?`The two methods agree within ${pct(Math.abs(d),0)}. The fee looks well supported.`:
+  d>0?`The expanded method is ${pct(d,0)} above the top-down estimate. Check whether the schedule or staffing is carrying more effort than the work needs, or whether the top-down estimate is light.`:
+  `The expanded method is ${pct(-d,0)} below the top-down estimate. The RFP schedule may be too compressed for the staffing shown, or the top-down estimate may be generous.`;
+ $('sf-cmp').textContent=`${d>=0?'+':''}${pct(d)} variance`;
+}
+
+/* ---------- consultants ---------- */
+function drawCons(){
+ const arch=S.consBasis==='gut'?R.gut.t:R.exp.t,b=R.budget;
+ const cTot=S.cons.reduce((a,c)=>a+(c.fee||0),0),team=arch+cTot;
+ S.cons.forEach((c,i)=>{const pe=$('cp-'+i),re=$('cr-'+i);if(pe)pe.textContent=pct((c.fee||0)/b,2);if(re)re.textContent=arch?((c.fee||0)/arch).toFixed(2)+'×':'–';});
+ const shades=[70,55,42,32,24,18,14,10];
+ const segs=[{n:'Architecture',v:arch,c:'var(--ink)',dark:true}].concat(S.cons.map((c,i)=>({n:c.name||'Consultant',v:c.fee||0,c:`color-mix(in srgb,var(--ink) ${shades[i%8]}%,var(--sheet))`,dark:i%8<2})));
+ const vis=segs.filter(s=>s.v>0);
+ $('cons-bar').innerHTML=vis.map(s=>`<div style="width:${s.v/team*100}%;background:${s.c};color:${s.dark?'var(--sheet)':'var(--ink)'}" title="${s.n}">${s.v/team>0.09?pct(s.v/team,0):''}</div>`).join('');
+ $('cons-leg').innerHTML=vis.map(s=>`<span><i style="background:${s.c}"></i>${s.n} ${pct(s.v/team,1)}</span>`).join('');
+ $('cons-table').innerHTML=
+  `<tr><td>Architectural fee (${S.consBasis==='gut'?'top-down estimate':'expanded'})</td><td>${money(arch)}</td><td>${pct(arch/b,2)}</td></tr>`+
+  `<tr><td>Sub-consultants</td><td>${money(cTot)}</td><td>${pct(cTot/b,2)}</td></tr>`+
+  `<tr class="tot"><td>Design team total</td><td>${money(team)}</td><td>${pct(team/b,2)}</td></tr>`+
+  `<tr><td>Architecture share of team fee</td><td colspan="2">${pct(arch/team,1)}</td></tr>`;
+ $('sf-cons').textContent=`team ${pct(team/b,1)} of const.`;
+}
+
+/* ---------- RAIC ---------- */
+function raicCalc(){
+ const b=R.budget,band=b<5e5?0:b<1e6?1:b<2e6?2:b<5e6?3:b<1e7?4:b<2.5e7?5:6;
+ const cat=S.raic.cat||TYPE_CAT[S.budget.type]||3,T=S.raic.basis==='eng'?RAIC_T6:RAIC_T5;
+ const base=T[cat][band],cx=Number(S.raic.cx)||1;
+ const adj=1+RAIC_FAC.reduce((a,[id])=>a+(S.raic.f[id]&&S.raic.f[id].on?Number(S.raic.f[id].v)||0:0),0);
+ const pctv=base*cx*adj,fee=b*pctv/100;
+ const pre=R.design.find(p=>p.id==='pre'),comp=R.exp.t-(pre?pre.fee:0)-(R.warr.fee||0);
+ const smeRe=/struct|mech|elec/i;const sme=S.cons.filter(c=>smeRe.test(c.name)).reduce((a,c)=>a+(c.fee||0),0);
+ const ours=S.raic.basis==='eng'?comp+sme:comp,gutOurs=S.raic.basis==='eng'?R.gut.t+sme:R.gut.t;
+ const hfx=Number(S.raic.hfx)||1,hfee=fee*hfx,hpct=pctv*hfx;
+ return{hfx,hfee,hpct,band,cat,T,base,cx,adj,pctv,fee,comp,sme,ours,gutOurs,over50:b>=5e7};
+}
+function drawRaic(){
+ if(!(R.budget>0)){$('raic-chart').innerHTML='';$('raic-verdict').textContent='Add the project size or client budget in 01 Project setup to see the RAIC benchmark.';$('raic-split').innerHTML='';['raic-base','raic-pct','raic-fee','raic-hfx','raic-hfx-note','raic-band','raic-split-note','sf-raic'].forEach(id=>$(id).textContent='');return;}
+ const Q=raicCalc(),b=R.budget;
+ const ourPct=Q.ours/b*100,gutPct=Q.gutOurs/b*100;
+ $('raic-base').textContent=`Cat. ${Q.cat}, ${RAIC_BANDS[Q.band]}: ${Q.base.toFixed(2)}% × ${Number(Q.cx).toFixed(2)} × ${Q.adj.toFixed(2)}`;
+ $('raic-pct').textContent=Q.pctv.toFixed(2)+'%';
+ $('raic-fee').textContent=money(Q.fee);
+ $('raic-hfx').textContent=`${money(Q.hfee)} · ${Q.hpct.toFixed(2)}%`;
+ $('raic-hfx-note').textContent=`Recommended Halifax reduction: ${pct(1-Q.hfx,0)} below the RAIC fee (−${money(Q.fee-Q.hfee)}).`;
+ $('raic-band').textContent=(S.raic.cat?'':`Category ${Q.cat} picked from the project type (${typeOf().name}). `)+(Q.over50?'The guide says fees above $50M are negotiated; the $25M–$50M column is used. ':'')+(S.raic.basis==='eng'?`Our side adds structural, mechanical and electrical fees from the design team section (${money(Q.sme)}).`:'Our side is the architectural fee only.');
+ // chart
+ const rows=[1,2,3,4,5,6,7],L=250,Rt=740,top=26,rh=38;
+ const vals=rows.map(c=>Q.T[c][Q.band]);
+ const xmax=Math.ceil(Math.max(...vals.map(v=>v*1.15),ourPct,gutPct,Q.pctv)+1);
+ const x=v=>L+(Rt-L)*v/xmax;const H=top+rows.length*rh+30;
+ const svg=$('raic-chart');svg.setAttribute('viewBox',`0 0 760 ${H}`);
+ let g='';
+ for(let t=0;t<=xmax;t+=(xmax>16?4:2))g+=`<line x1="${x(t)}" x2="${x(t)}" y1="${top-8}" y2="${top+rows.length*rh}" style="stroke:var(--rule-2)"/><text x="${x(t)}" y="${top+rows.length*rh+16}" text-anchor="middle" style="fill:var(--ink-3);font:11px var(--f-mono)">${t}%</text>`;
+ rows.forEach((c,i)=>{
+  const v=vals[i],y=top+i*rh+rh/2,sel=c===Q.cat;
+  g+=`<text x="0" y="${y-3}" style="fill:${sel?'var(--ink)':'var(--ink-2)'};font:${sel?600:500} 13px var(--f-disp);letter-spacing:.04em">CAT ${c}</text><text x="0" y="${y+11}" style="fill:var(--ink-3);font:11px var(--f-body)">${RAIC_CAT[c].length>40?RAIC_CAT[c].slice(0,39)+'…':RAIC_CAT[c]}</text>`;
+  g+=`<rect x="${x(v*.85)}" y="${y-7}" width="${x(v*1.15)-x(v*.85)}" height="14" rx="2" style="fill:${sel?'color-mix(in srgb,var(--con) 45%,var(--sheet))':'color-mix(in srgb,var(--ink-3) 35%,var(--sheet))'}"><title>Category ${c}: ${(v*.85).toFixed(2)}–${(v*1.15).toFixed(2)}%, average ${v.toFixed(2)}%</title></rect>`;
+  g+=`<line x1="${x(v)}" x2="${x(v)}" y1="${y-9}" y2="${y+9}" style="stroke:var(--ink)" stroke-width="2"/>`;
+  if(sel){g+=`<text x="${x(v*1.15)+6}" y="${y+4}" style="fill:var(--ink-2);font:11px var(--f-mono)">${(v*.85).toFixed(1)}–${(v*1.15).toFixed(1)}%</text>`;
+   if(Math.abs(Q.pctv-v*Number(Q.cx))>0.001||true){g+=`<path d="M${x(Q.pctv)} ${y-12} l5 -7 h-10z" style="fill:var(--con)"><title>RAIC adjusted ${Q.pctv.toFixed(2)}%</title></path>`;
+   g+=`<path d="M${x(Q.hpct)} ${y+12} l5 7 h-10z" style="fill:var(--good)"><title>Halifax-adjusted ${Q.hpct.toFixed(2)}%</title></path><text x="${x(Q.hpct)}" y="${y+30}" text-anchor="middle" style="fill:var(--good);font:600 10.5px var(--f-mono)">HFX ${Q.hpct.toFixed(1)}%</text>`;}}
+ });
+ const yb=top+rows.length*rh;
+ g+=`<line x1="${x(ourPct)}" x2="${x(ourPct)}" y1="${top-10}" y2="${yb}" style="stroke:var(--red)" stroke-width="2.5"/><text x="${x(ourPct)}" y="${top-13}" text-anchor="middle" style="fill:var(--red);font:600 11px var(--f-mono)">Expanded ${ourPct.toFixed(2)}%</text>`;
+ if(Q.gutOurs>R.specFee+0.5)g+=`<line x1="${x(gutPct)}" x2="${x(gutPct)}" y1="${top-2}" y2="${yb}" style="stroke:var(--design)" stroke-width="2" stroke-dasharray="4 3"/>`;
+ if(Q.gutOurs>R.specFee+0.5)g+=`<text x="${x(gutPct)}" y="${yb+28}" text-anchor="middle" style="fill:var(--design);font:600 11px var(--f-mono)">Top-down ${gutPct.toFixed(2)}%</text>`;
+ svg.innerHTML=g;
+ const r=Q.ours/Q.fee,rx=Q.ours/Q.hfee,lo=Q.fee/ (Number(Q.cx)||1)*0.85,hi=Q.fee/(Number(Q.cx)||1)*1.15;
+ $('raic-verdict').innerHTML=`The RAIC recommended fee is ${money(Q.fee)}. With the recommended Halifax reduction of <b>${pct(1-Q.hfx,0)}</b>, the local benchmark is <b>${money(Q.hfee)}</b>. Our expanded fee (comparable scope) is <b>${money(Q.ours)}</b>: <b>${pct(rx,0)}</b> of the Halifax benchmark and ${pct(r,0)} of the national figure. `+
+  (rx<0.85?`That is still well under the Halifax benchmark. Check whether the scope is lighter than basic services, or whether the fee is being squeezed by the market.`:rx>1.15?`That is above the Halifax benchmark. Make sure the extra effort is visible to the client (strategy modifiers, meetings, CA).`:`That sits close to the Halifax benchmark.`)+
+  ` Top-down estimate: ${pct(Q.gutOurs/Q.hfee,0)} of the Halifax benchmark.`;
+ $('sf-raic').textContent=`Cat. ${Q.cat} · HFX ${short(Q.hfee)} · ours ${pct(rx,0)}`;
+ // phase split
+ const d=id=>R.design.find(p=>p.id===id).fee;
+ const ours=[d('sd'),d('dd'),d('cd')+R.specFee,R.tender.fee,R.ca.fee];const ot=ours.reduce((a,b)=>a+b,0)||1;
+ const archFee=S.raic.basis==='eng'?Q.fee*(Q.comp/(Q.comp+Q.sme||1)):Q.fee;
+ $('raic-split').innerHTML=RAIC_SPLIT.map(([n,t,e],i)=>{const o=ours[i]/ot*100,dlt=o-t;
+  return `<tr><td>${n}</td><td>${t}%</td><td>${e}%</td><td class="${Math.abs(dlt)>7.5?'delta-pos':''}">${o.toFixed(1)}%</td><td>${money(archFee*t/100)}</td><td>${money(ours[i])}</td></tr>`;}).join('')+
+  `<tr class="tot"><td>Total (SD to CA)</td><td>100%</td><td></td><td>100%</td><td>${money(archFee)}</td><td>${money(ot)}</td></tr>`;
+ $('raic-split-note').textContent=`Predesign (${money(d('pre'))}) and warranty (${money(R.warr.fee)}) are outside RAIC basic services and not in this table.`+(S.raic.basis==='eng'?' RAIC $ column shows the architectural share of the Table 6 fee, split by Table 1.':'')+' Red marks a phase more than 7.5 points off the typical split.';
+}
+
+/* ---------- copy summary ---------- */
+$('copy').onclick=()=>{
+ const {gut,exp,budget,ca}=R;
+ const L=[S.name+(S.location?' — '+S.location:''),`Construction budget: ${money(budget)}`,'',
+ `Top-down estimate: ${money(gut.t)} (${pct(gut.t/budget,2)}), design ${money(gut.d)} / construction ${money(gut.c)}`,
+ `Expanded: ${money(exp.t)} (${pct(exp.t/budget,2)}), design ${money(exp.d)} / construction ${money(exp.c)}`,
+ `CA monthly average: ${money(ca.monthly)} (target ${money(S.caLo)}–${money(S.caHi)})`,'',
+ 'Phase\tWeeks\t$/h\tHours\tFee'];
+ [...R.design,R.tender].filter(p=>p.on).forEach(p=>L.push(`${p.name}\t${p.weeks}\t${Math.round(p.rate)}\t${Math.round(p.hours)}\t${money(p.fee)}`));
+ if(R.specFee)L.push(`External spec writer\t\t\t\t${money(R.specFee)}`);
+ if(S.ca.on)R.stages.forEach(s=>L.push(`CA: ${s.name}\t${s.weeks}\t${Math.round(s.rate)}\t${Math.round(s.hours)}\t${money(s.fee)}`));
+ if(R.warr.on)L.push(`Warranty\t${R.warr.weeks}\t${Math.round(R.warr.rate)}\t${Math.round(R.warr.hours)}\t${money(R.warr.fee)}`);
+ L.push(`Strategy modifiers: client ${S.mods.client}, approvals ${S.mods.approvals}, coordination ${S.mods.coord}, redesign ${S.mods.rev}. Weekly +${R.mod.pw.toFixed(2)} h/wk ${money(R.mod.wkFee)}; approval reviews +${R.mod.revW} wks ${money(R.mod.revFee)}; redesign allowance ${pct(R.mod.rdPct,0)} of SD–CD ${money(R.mod.rdFee)} (all included above)`);
+ {const Q=raicCalc();L.push(`RAIC recommended fee: category ${Q.cat}, ${Q.pctv.toFixed(2)}% = ${money(Q.fee)}. Recommended Halifax reduction ${pct(1-Q.hfx,0)} → ${money(Q.hfee)} (${Q.hpct.toFixed(2)}%). Expanded comparable ${money(Q.ours)} = ${pct(Q.ours/Q.hfee,0)} of Halifax benchmark`);}
+ L.push(`Disbursements (mileage)\t\t\t\t${money(exp.disb)}`);
+ copyText(L.join('\n'),'toast');
+};
+
+/* ---------- saved projects ---------- */
+function ago(t){if(!t)return '';const m=Math.round((Date.now()-t)/60000);if(m<1)return 'just now';if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<24)return h+' h ago';return new Date(t).toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'});}
+function pjNote(t,bad){const n=$('pj-note');n.textContent=t;n.style.color=bad?'var(--red)':'';}
+function pjRender(){
+ const cur=PJ.list.find(p=>p.id===PJ.id);
+ $('pj-cur').textContent=PJ.id?(cur?cur.name:S.name):'Unsaved project';
+ const st=$('pj-state');
+ if(!PJ.db){st.textContent='Browser only';st.className='pj-state';}
+ else if(PJ.busy){st.textContent='Saving…';st.className='pj-state';}
+ else if(!PJ.id){st.textContent='Not saved yet';st.className='pj-state dirty';}
+ else if(PJ.dirty){st.textContent='Unsaved changes';st.className='pj-state dirty';}
+ else{st.textContent='Saved '+ago(cur&&cur.updatedAt||PJ.stamp);st.className='pj-state ok';}
+ ['pj-save','pj-saveas','pj-del'].forEach(id=>$(id).disabled=!PJ.db||PJ.busy);
+ $('pj-del').disabled=!PJ.db||!PJ.id||PJ.busy;
+ const q=($('pj-q').value||'').toLowerCase();
+ const items=PJ.list.filter(p=>!q||(p.name+' '+(p.location||'')).toLowerCase().includes(q));
+ $('pj-list').innerHTML=PJ.db?(items.length?items.map(p=>`<button type="button" class="pj-item${p.id===PJ.id?' on':''}" data-pj="${p.id}"><b></b><span>${[p.location,p.typeName].filter(Boolean).map(esc).join(' · ')}</span><span>${short(p.budget)} const. · fee ${short(p.expFee)} (${pct(p.expFee/p.budget,1)})</span><span>Saved ${ago(p.updatedAt)}</span></button>`).join(''):`<p class="note">${PJ.list.length?'No saved project matches that search.':'No saved projects yet. Name the project in the title block and click Save.'}</p>`):'';
+ [...$('pj-list').querySelectorAll('[data-pj]')].forEach(b=>{const p=PJ.list.find(x=>x.id===b.dataset.pj);b.querySelector('b').textContent=p.name||'Untitled';});
+}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function pjPayload(){return{name:S.name||'Untitled',location:S.location||'',typeName:typeOf().name,budget:R.budget,expFee:R.exp.t,gutFee:R.gut.t,caMonthly:R.ca.monthly,updatedAt:Date.now(),state:JSON.stringify(S)};}
+function pjErr(e){const c=e&&e.code;pjNote(c==='quota_exceeded'?'The project store is full. Delete old projects to save new ones.':c==='invalid_argument'?'You can view saved projects but not save them. Ask the owner for edit or interact access.':'Could not save just now. Try again in a moment.',true);}
+async function pjSave(asNew){
+ if(!PJ.db||PJ.busy)return;
+ if(!(S.name||'').trim()){$('nm-in').classList.add('need');$('nm-in').focus();pjNote('Name the project first, then Save.',true);return;}PJ.busy=true;pjRender();
+ try{
+  let name=S.name||'Untitled';
+  if(asNew&&PJ.list.some(p=>p.name===name)){name+=' (copy)';S.name=name;fill();store();}
+  const body=pjPayload();
+  if(PJ.id&&!asNew){await PJ.db.doc('projects/'+PJ.id).set(body);}
+  else{const ref=await PJ.db.collection('projects').add(body);PJ.id=ref.id;}
+  PJ.stamp=body.updatedAt;PJ.dirty=false;pjPersist();pjNote(asNew?'Saved as a new project.':'Project saved.');
+ }catch(e){pjErr(e);}
+ PJ.busy=false;pjRender();
+}
+function pjOpen(p,silent){
+ let st;try{st=JSON.parse(p.state);}catch(e){pjNote('That project could not be read.',true);return;}
+ S=migrate(st);PJ.id=p.id;PJ.stamp=p.updatedAt;PJ.dirty=false;PJ.pendingOpen=null;pjPersist();store();
+ buildCons();fill();compute();
+ if(!silent)pjNote(`Opened “${p.name}”.`);pjRender();
+}
+$('pj-list').addEventListener('click',e=>{
+ const b=e.target.closest('[data-pj]');if(!b)return;const p=PJ.list.find(x=>x.id===b.dataset.pj);if(!p)return;
+ if(p.id===PJ.id&&!PJ.dirty)return;
+ if(PJ.dirty&&PJ.pendingOpen!==p.id){PJ.pendingOpen=p.id;pjNote(`You have unsaved changes. Click “${p.name}” again to open it and discard them, or Save first.`,true);return;}
+ pjOpen(p);
+});
+$('pj-save').onclick=()=>pjSave(false);
+$('pj-saveas').onclick=()=>pjSave(true);
+$('pj-q').addEventListener('input',e=>{e.stopPropagation();pjRender();});
+let newArmed=false;
+$('pj-new').onclick=()=>{
+ if(PJ.dirty&&!newArmed){newArmed=true;$('pj-new').textContent='Discard changes?';setTimeout(()=>{newArmed=false;$('pj-new').textContent='New project'},3000);return;}
+ newArmed=false;$('pj-new').textContent='New project';
+ S=example();S.name='';S.location='';S.refs={};S.budget.override=0;
+ PJ.id=null;PJ.stamp=null;PJ.dirty=false;pjPersist();store();buildCons();fill();compute();
+ pjNote('New project started from the default assumptions. Name it, then Save.');pjRender();try{$('nm-in').focus();}catch(e){}
+};
+$('pj-del').onclick=async()=>{
+ if(!PJ.db||!PJ.id)return;
+ if(!PJ.delArmed){PJ.delArmed=true;$('pj-del').textContent='Click again to delete';setTimeout(()=>{PJ.delArmed=false;$('pj-del').textContent='Delete'},3000);return;}
+ PJ.delArmed=false;$('pj-del').textContent='Delete';
+ try{await PJ.db.doc('projects/'+PJ.id).delete();PJ.id=null;PJ.stamp=null;PJ.dirty=true;pjPersist();pjNote('Project deleted. The figures stay on screen until you open or start another.');}catch(e){pjErr(e);}
+ pjRender();
+};
+(async()=>{
+ let db=null;
+ try{db=window.claude&&window.claude.use?await window.claude.use('db'):null;}catch(e){db=null;}
+ if(!db){pjNote('Saved projects aren\'t available in this view. Your work is kept in this browser only.');pjRender();return;}
+ PJ.db=db;pjNote('');pjRender();
+ db.collection('projects').orderBy('updatedAt','desc').limit(300).onSnapshot(snap=>{
+  PJ.list=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
+  const cur=PJ.list.find(p=>p.id===PJ.id);
+  if(PJ.id&&!cur&&!snap.metadata.fromCache){PJ.id=null;PJ.dirty=true;pjPersist();}
+  if(cur&&PJ.stamp&&cur.updatedAt>PJ.stamp&&!snap.metadata.hasPendingWrites){
+   if(!PJ.dirty){pjOpen(cur,true);pjNote('Loaded a newer version saved elsewhere.');}
+   else pjNote('A newer version of this project was saved elsewhere. Saving now will replace it.',true);
+  }
+  if(!PJ.list.length)pjNote('');
+  pjRender();
+ },e=>{pjNote('Saved projects could not be loaded. Reload the page to try again.',true);});
+ setInterval(pjRender,60000);
+})();
+
+/* ---------- site visits from setup ---------- */
+document.addEventListener('click',e=>{const a=e.target.closest('.go-setup');if(!a)return;e.preventDefault();
+ const t=document.querySelector('[data-k="meet.con.every"]');const d=t&&t.closest('details.sec');if(d)d.open=true;
+ if(t){t.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>t.focus({preventScroll:true}),350);}});
+
+/* ---------- remember open sections ---------- */
+(function(){
+ const secs=[...document.querySelectorAll('details.sec')];let open=[];
+ try{open=JSON.parse(localStorage.getItem(KEY+'.open3')||'[]')}catch(e){}
+ secs.forEach((d,i)=>{if(open.includes(i))d.open=true;
+  d.addEventListener('toggle',()=>{const o=secs.map((x,j)=>x.open?j:-1).filter(j=>j>=0);try{localStorage.setItem(KEY+'.open3',JSON.stringify(o))}catch(e){}});});
+})();
+
+$('exp-accept').onclick=()=>{S.expSet=true;save();compute();};
+buildAll();
+pjRender();
+if(!(R.budget>0))document.querySelector('details.sec-first').open=true;
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('service-worker.js').catch(()=>{});});}
+</script>
+
+</body></html>
