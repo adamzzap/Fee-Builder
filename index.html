@@ -576,7 +576,17 @@ footer .note{flex:1 1 300px}
 
 <datalist id="leadticks"><option value="0"></option><option value="50"></option><option value="100"></option></datalist>
 
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.14.1/firebase-app-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.14.1/firebase-firestore-compat.js"></script>
 <script>
+const FIREBASE_CONFIG={
+ apiKey:"AIzaSyDFxSXjFUJeMi1eA5X4hB2Pg-LBciMSIzg",
+ authDomain:"fee-builder.firebaseapp.com",
+ projectId:"fee-builder",
+ storageBucket:"fee-builder.firebasestorage.app",
+ messagingSenderId:"688580453355",
+ appId:"1:688580453355:web:3abb228c093036ae4aafae"
+};
 const TYPES=[
  {id:'wood',name:'Multi-res, wood frame',unit:'unit',qtyLbl:'Units',lo:330000,hi:450000,step:5000,def:385000,qty:40},
  {id:'noncomb',name:'Multi-res, non-combustible',unit:'unit',qtyLbl:'Units',lo:420000,hi:560000,step:5000,def:485000,qty:60},
@@ -1306,7 +1316,13 @@ $('pj-del').onclick=async()=>{
 };
 (async()=>{
  let db=null;
- try{db=window.claude&&window.claude.use?await window.claude.use('db'):null;}catch(e){db=null;}
+ try{
+  if(window.claude&&window.claude.use){db=await window.claude.use('db');}
+  else if(window.firebase&&FIREBASE_CONFIG.apiKey){
+   if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+   db=firebase.firestore();
+  }
+ }catch(e){db=null;}
  if(!db){pjNote('Saved projects aren\'t available in this view. Your work is kept in this browser only.');pjRender();return;}
  PJ.db=db;pjNote('');pjRender();
  db.collection('projects').orderBy('updatedAt','desc').limit(300).onSnapshot(snap=>{
